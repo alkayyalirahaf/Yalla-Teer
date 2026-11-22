@@ -117,3 +117,4 @@ Open [http://localhost:8000](http://localhost:8000).
 
 The repository's `.gitignore` excludes local dependencies, environment secrets, and generated assets, including `vendor/`, `node_modules/`, `.env`, and `public/build/`. Install dependencies and build assets using the commands above. Never submit a populated `.env` file or API keys.
 
+# Trello Link [https://trello.com/b/GwcxKa78/yalla-%D9%86%D8%B7%D9%8A%D8%B1]
