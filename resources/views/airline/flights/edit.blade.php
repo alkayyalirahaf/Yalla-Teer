@@ -53,8 +53,16 @@
         <div class="form-grid">
             <div class="field">
                 <span>Airline</span>
-                <input type="text" value="{{ $airline->name ?? $flight->airline->name }}{{ isset($airline->code) ? ' ('.$airline->code.')' : (isset($flight->airline->code) ? ' ('.$flight->airline->code.')' : '') }}" readonly aria-readonly="true">
-                <small class="muted">Locked to your airline.</small>
+                @php($displayAirline = $airline ?? $flight->airline)
+                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.35rem;">
+                    @if ($displayAirline?->logo)
+                        <img src="{{ asset('storage/'.$displayAirline->logo) }}" alt="{{ $displayAirline->name }} logo" width="44" height="44" style="object-fit:contain; border-radius:0.5rem; background:#fff; border:1px solid #e5e7eb;">
+                    @else
+                        <span class="subtle" style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border:1px dashed #d1d5db; border-radius:0.5rem; font-size:0.75rem;">No logo</span>
+                    @endif
+                    <input type="text" value="{{ $displayAirline?->name ?? 'Your airline' }}{{ $displayAirline?->code ? ' ('.$displayAirline->code.')' : '' }}" readonly aria-readonly="true" style="flex:1;">
+                </div>
+                <small class="muted">Locked to your airline. Manage origin country and logo in <a href="{{ route('airline.settings') }}">Airline settings</a>.</small>
             </div>
             <label class="field">
                 <span>Flight number</span>

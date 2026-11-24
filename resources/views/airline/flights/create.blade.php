@@ -51,8 +51,15 @@
         <div class="form-grid">
             <div class="field">
                 <span>Airline</span>
-                <input type="text" value="{{ $airline->name ?? 'Your airline' }}{{ isset($airline->code) ? ' ('.$airline->code.')' : '' }}" readonly aria-readonly="true">
-                <small class="muted">Locked to your airline.</small>
+                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.35rem;">
+                    @if ($airline?->logo)
+                        <img src="{{ asset('storage/'.$airline->logo) }}" alt="{{ $airline->name }} logo" width="44" height="44" style="object-fit:contain; border-radius:0.5rem; background:#fff; border:1px solid #e5e7eb;">
+                    @else
+                        <span class="subtle" style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border:1px dashed #d1d5db; border-radius:0.5rem; font-size:0.75rem;">No logo</span>
+                    @endif
+                    <input type="text" value="{{ $airline->name ?? 'Your airline' }}{{ isset($airline->code) ? ' ('.$airline->code.')' : '' }}" readonly aria-readonly="true" style="flex:1;">
+                </div>
+                <small class="muted">Locked to your airline. Manage origin country and logo in <a href="{{ route('airline.settings') }}">Airline settings</a>.</small>
             </div>
             <label class="field">
                 <span>Flight number</span>
@@ -107,7 +114,7 @@
             <label class="field">
                 <span>Status</span>
                 <select name="status" required>
-                    @foreach(['scheduled', 'delayed', 'cancelled', 'completed'] as $status)
+                    @foreach(['scheduled', 'delayed', 'completed'] as $status)
                         <option value="{{ $status }}" @selected(old('status', 'scheduled') === $status)>{{ ucfirst($status) }}</option>
                     @endforeach
                 </select>
