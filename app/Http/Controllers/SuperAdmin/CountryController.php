@@ -14,7 +14,7 @@ class CountryController
     {
         $this->authorizeAdmin($request);
 
-        $countries = Country::withCount('cities')->orderBy('name')->paginate(15);
+        $countries = Country::withCount('cities')->orderBy('name')->paginate(5);
 
         return view('super-admin.countries.index', compact('countries'));
     }

@@ -28,7 +28,6 @@ use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\FlightController as AdminFlightController;
 use App\Http\Controllers\SuperAdmin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
-use App\Http\Middleware\SetLandingLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,15 +56,13 @@ use App\Http\Controllers\AirlineAdmin\ReviewController as AirlineReviewControlle
 
 
 
-Route::middleware(SetLandingLocale::class)->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-   Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
 
 Route::post('/language/{locale}', function (Request $request, string $locale) {
     $request->session()->put('landing_locale', $locale);
 
-    return redirect()->route('home');
+    return $request->expectsJson() ? response()->noContent() : back(fallback: route('home'));
 })->whereIn('locale', ['en', 'ar'])->name('home.language');
 
 Route::redirect('/destinations/{country}', '/destinations');

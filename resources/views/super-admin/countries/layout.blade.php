@@ -1,6 +1,6 @@
 @extends('super-admin.management-layout')
 
-@section('admin-title', 'Countries')
+@section('admin-title', __('Countries'))
 @section('admin-content')
     @yield('countries-content')
 @endsection

@@ -13,7 +13,7 @@ class BookingController
 {
     public function index(Request $request)
     {
-        $bookings = $request->user()->customer->bookings()->latest('id')->paginate(15);
+        $bookings = $request->user()->customer->bookings()->latest('id')->paginate(5);
 
         return view('booking.records', compact('bookings'));
     }

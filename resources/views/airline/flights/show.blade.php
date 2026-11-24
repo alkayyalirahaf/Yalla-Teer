@@ -9,36 +9,36 @@
         <p><span class="badge">{{ $flight->originAirport->code }} → {{ $flight->destinationAirport->code }}</span></p>
     </div>
     <div class="actions">
-        <span class="badge">{{ ucfirst($flight->status) }}</span>
-        <a class="button" href="{{ route('airline.edit', $flight) }}">Edit Flight</a>
+        <span class="badge">{{ __(ucfirst($flight->status)) }}</span>
+        <a class="button" href="{{ route('airline.edit', $flight) }}">{{ __('Edit Flight') }}</a>
     </div>
 </div>
 
-<section class="panel cards section" aria-label="Flight summary">
-    <div><p>Origin</p><h2>{{ $flight->originAirport->name }}</h2><p>{{ $flight->originAirport->city->name ?? '' }}</p></div>
-    <div><p>Destination</p><h2>{{ $flight->destinationAirport->name }}</h2><p>{{ $flight->destinationAirport->city->name ?? '' }}</p></div>
-    <div><p>Departure</p><h2>{{ $flight->departure_at->format('Y-m-d H:i') }}</h2></div>
-    <div><p>Arrival</p><h2>{{ $flight->arrival_at->format('Y-m-d H:i') }}</h2></div>
+<section class="panel cards section" aria-label="{{ __('Flight summary') }}">
+    <div><p>{{ __('Origin') }}</p><h2>{{ $flight->originAirport->name }}</h2><p>{{ $flight->originAirport->city->name ?? '' }}</p></div>
+    <div><p>{{ __('Destination') }}</p><h2>{{ $flight->destinationAirport->name }}</h2><p>{{ $flight->destinationAirport->city->name ?? '' }}</p></div>
+    <div><p>{{ __('Departure') }}</p><h2>{{ $flight->departure_at->format('Y-m-d H:i') }}</h2></div>
+    <div><p>{{ __('Arrival') }}</p><h2>{{ $flight->arrival_at->format('Y-m-d H:i') }}</h2></div>
 </section>
 
 <section class="section">
-    <h2>Cabin seat maps</h2>
+    <h2>{{ __('Cabin seat maps') }}</h2>
     <div class="cards">
         @forelse($flight->flightClasses as $flightClass)
             <article class="panel stack">
                 <div class="flight-card">
-                    <h3>{{ ucfirst($flightClass->class) }}</h3>
+                    <h3>{{ __(ucfirst($flightClass->class)) }}</h3>
                     <span class="badge">{{ $flightClass->total_seats }} seats</span>
                 </div>
-                <div class="actions" aria-label="Seat status legend">
-                    <span class="badge" style="color:var(--gold);border-color:var(--gold)">Available</span>
-                    <span class="badge" style="color:var(--highlight);border-color:var(--highlight)">Held</span>
-                    <span class="badge" style="color:var(--muted);border-color:var(--border)">Booked</span>
+                <div class="actions" aria-label="{{ __('Seat status legend') }}">
+                    <span class="badge" style="color:var(--gold);border-color:var(--gold)">{{ __('Available') }}</span>
+                    <span class="badge" style="color:var(--highlight);border-color:var(--highlight)">{{ __('Held') }}</span>
+                    <span class="badge" style="color:var(--muted);border-color:var(--border)">{{ __('Booked') }}</span>
                 </div>
                 <div class="table-wrap">
                     <table>
-                        <caption>{{ ucfirst($flightClass->class) }} seat map</caption>
-                        <thead><tr><th scope="col">Row</th><th scope="col">Seats</th></tr></thead>
+                        <caption>{{ __(ucfirst($flightClass->class)) }} seat map</caption>
+                        <thead><tr><th scope="col">{{ __('Row') }}</th><th scope="col">{{ __('Seats') }}</th></tr></thead>
                         <tbody>
                             @forelse($flightClass->seats->groupBy(fn ($seat) => (int) preg_replace('/\D+/', '', $seat->seat_number))->sortKeys() as $rowNumber => $seats)
                                 <tr>
@@ -60,23 +60,23 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="2">No seats are configured for this cabin.</td></tr>
+                                <tr><td colspan="2">{{ __('No seats are configured for this cabin.') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             </article>
         @empty
-            <p class="panel">No cabin classes are configured for this flight.</p>
+            <p class="panel">{{ __('No cabin classes are configured for this flight.') }}</p>
         @endforelse
     </div>
 </section>
 
 <section class="panel table-wrap section">
-    <h2>Bookings</h2>
+    <h2>{{ __('Bookings') }}</h2>
     <table>
-        <caption>Passengers booked on this flight</caption>
-        <thead><tr><th scope="col">Booking code</th><th scope="col">Customer</th><th scope="col">Class</th><th scope="col">Booking status</th></tr></thead>
+        <caption>{{ __('Passengers booked on this flight') }}</caption>
+        <thead><tr><th scope="col">{{ __('Booking code') }}</th><th scope="col">{{ __('Customer') }}</th><th scope="col">{{ __('Class') }}</th><th scope="col">{{ __('Booking status') }}</th></tr></thead>
         <tbody>
             @forelse($flight->bookingFlights as $bookingFlight)
                 <tr>
@@ -86,7 +86,7 @@
                     <td><span class="badge">{{ ucfirst($bookingFlight->booking?->status ?? 'unknown') }}</span></td>
                 </tr>
             @empty
-                <tr><td colspan="4">No bookings for this flight yet.</td></tr>
+                <tr><td colspan="4">{{ __('No bookings for this flight yet.') }}</td></tr>
             @endforelse
         </tbody>
     </table>

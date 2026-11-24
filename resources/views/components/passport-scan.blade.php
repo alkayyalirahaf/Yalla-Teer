@@ -1,30 +1,30 @@
 @props(['passengerIndex'])
 
 <details class="passport-scan" data-passport-scan data-passenger-index="{{ $passengerIndex }}" data-endpoint="{{ url('/book/passport-scan') }}">
-    <summary aria-label="Upload your passport (optional)">
+    <summary aria-label="{{ __('Upload your passport (optional)') }}">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 7h4l2-3h6l2 3h4a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/>
             <circle cx="12" cy="13" r="3.5"/>
         </svg>
-        <span>Upload your passport</span>
+        <span>{{ __('Upload your passport') }}</span>
     </summary>
     <div class="passport-scan-body">
         <label class="field passport-scan-upload">
-            <span>Passport photo</span>
+            <span>{{ __('Passport photo') }}</span>
             <input type="file" accept="image/jpeg,image/png,image/webp" data-passport-image>
-            <small>JPEG, PNG or WebP · Max 5 MB</small>
+            <small>{{ __('JPEG, PNG or WebP · Max 5 MB') }}</small>
         </label>
         <label class="passport-scan-consent">
             <input type="checkbox" data-passport-consent>
-            <span>Send this photo to Google for a one-time scan. <small>Yalla Teer does not keep it.</small></span>
+            <span>{{ __('Send this photo to Google for a one-time scan.') }} <small>{{ __('Yalla Teer does not keep it.') }}</small></span>
         </label>
-        <button class="button secondary" type="button" data-passport-scan-button>Scan passport</button>
+        <button class="button secondary" type="button" data-passport-scan-button>{{ __('Scan passport') }}</button>
         <p role="status" aria-live="polite" data-passport-status></p>
         <div data-passport-results hidden>
-            <p><strong>Check and correct the details against your passport.</strong></p>
+            <p><strong>{{ __('Check and correct the details against your passport.') }}</strong></p>
             <ul data-passport-warnings></ul>
             <div class="form-grid" data-passport-review></div>
-            <button class="button" type="button" data-passport-confirm disabled>Use reviewed values</button>
+            <button class="button" type="button" data-passport-confirm disabled>{{ __('Use reviewed values') }}</button>
         </div>
     </div>
 </details>

@@ -27,7 +27,7 @@ class ContactMessageController
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['type'] ?? null, fn ($query, $type) => $query->where('type', $type))
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.messages.index', compact('messages', 'filters'));

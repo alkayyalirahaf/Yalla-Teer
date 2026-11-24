@@ -1,10 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->isLocale('ar') ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
+    <script src="{{ asset('assets/theme.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/theme-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/theme-switch.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ asset('assets/assistant-shortcut.css') }}">
-    <title>Ticket {{ $ticket->ticket_number }} · Yalla Teer</title>
+    <title>{{ __('Ticket') }} {{ $ticket->ticket_number }} · Yalla Teer</title>
     <style id="ticket-styles">
         * { box-sizing: border-box; }
         body { margin: 0; padding: clamp(16px, 5vw, 56px); background: #17130e; color: #292017; font: 16px system-ui, sans-serif; }
@@ -47,63 +50,75 @@
             article { break-inside: avoid; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
         }
     </style>
+    <style media="screen">
+        body { background: var(--ui-bg); color: var(--ui-text); }
+        article { background: var(--ui-surface); border-color: var(--ui-border); border-radius: 8px; }
+        header { background: var(--ui-secondary); color: white; border-color: var(--ui-brand); }
+        .stub { background: var(--ui-raised); border-color: var(--ui-border); }
+        nav a,.ticket-action,.ticket-action:hover { color: var(--ui-link); }
+        .download-error { color: var(--ui-danger); }
+        .label { color: var(--ui-muted); }
+    </style>
 </head>
 <body>
     @php($leg = $ticket->bookingFlight)
     @php($flight = $leg->flight)
     <main>
-        <nav aria-label="Ticket actions">
-            <a href="{{ route('my.booking', $leg->booking->code) }}">Back to booking</a>
-            <button class="ticket-action" type="button" aria-label="Print" title="Print" onclick="window.print()">
+        <nav aria-label="{{ __('Ticket actions') }}">
+            <x-theme-switch />
+            <a href="{{ route('my.booking', $leg->booking->code) }}">{{ __('Back to booking') }}</a>
+            <button class="ticket-action" type="button" aria-label="{{ __('Print') }}" title="{{ __('Print') }}" onclick="window.print()">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M6 9V3h12v6M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v7H6zM6 12h1"/>
                 </svg>
             </button>
-            <button id="download-ticket" class="ticket-action" type="button" aria-label="Download PDF" title="Download PDF">
+            <button id="download-ticket" class="ticket-action" type="button" aria-label="{{ __('Download PDF') }}" title="{{ __('Download PDF') }}">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 3v12m-5-5 5 5 5-5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
                 </svg>
             </button>
         </nav>
-        <p id="download-error" class="download-error" role="alert" hidden>Could not download the PDF. Please try again.</p>
+        <p id="download-error" class="download-error" role="alert" hidden>{{ __('Could not download the PDF. Please try again.') }}</p>
         <article id="ticket" data-number="{{ $ticket->ticket_number }}">
             <div>
             <header>
-                <div><p class="cabin">Yalla Teer <span aria-hidden="true">✈</span></p><h1>Electronic ticket</h1></div>
+                <div><p class="cabin">{{ __('Yalla Teer') }} <span aria-hidden="true">✈</span></p><h1>{{ __('Electronic ticket') }}</h1></div>
                 <strong class="cabin">{{ $leg->flightClass->class }}</strong>
             </header>
             <section>
-                <p class="label">Passenger</p>
+                <p class="label">{{ __('Passenger') }}</p>
                 <h2>{{ $ticket->passenger->first_name }} {{ $ticket->passenger->last_name }}</h2>
                 <p class="route">{{ $flight->originAirport->code }} → {{ $flight->destinationAirport->code }}</p>
                 <dl>
-                    <div><dt>Booking reference</dt><dd>{{ $leg->booking->code }}</dd></div>
-                    <div><dt>Flight</dt><dd>{{ $flight->flight_number }} · {{ $flight->airline->name }}</dd></div>
-                    <div><dt>Departure</dt><dd>{{ $flight->departure_at->format('d M Y, H:i T') }}</dd></div>
-                    <div><dt>Cabin</dt><dd>{{ ucfirst($leg->flightClass->class) }}</dd></div>
-                    <div><dt>Seat</dt><dd>{{ $ticket->seat?->seat_number ?? 'Unassigned' }}</dd></div>
+                    <div><dt>{{ __('Booking reference') }}</dt><dd>{{ $leg->booking->code }}</dd></div>
+                    <div><dt>{{ __('Flight') }}</dt><dd>{{ $flight->flight_number }} · {{ $flight->airline->name }}</dd></div>
+                    <div><dt>{{ __('Departure') }}</dt><dd>{{ $flight->departure_at->format('d M Y, H:i T') }}</dd></div>
+                    <div><dt>{{ __('Cabin') }}</dt><dd>{{ __(ucfirst($leg->flightClass->class)) }}</dd></div>
+                    <div><dt>{{ __('Seat') }}</dt><dd>{{ $ticket->seat?->seat_number ?? 'Unassigned' }}</dd></div>
                 </dl>
-                <p class="ticket-id">Ticket number <strong>{{ $ticket->ticket_number }}</strong></p>
+                <p class="ticket-id">{{ __('Ticket number') }} <strong>{{ $ticket->ticket_number }}</strong></p>
             </section>
             </div>
-            <aside class="stub" aria-label="Ticket stub">
+            <aside class="stub" aria-label="{{ __('Ticket stub') }}">
                 <header>YALLA TEER <span aria-hidden="true">✈</span></header>
                 <section>
-                    <p class="label">Passenger</p>
+                    <p class="label">{{ __('Passenger') }}</p>
                     <h2>{{ $ticket->passenger->first_name }} {{ $ticket->passenger->last_name }}</h2>
                     <p>{{ $flight->originAirport->code }} → {{ $flight->destinationAirport->code }}</p>
                     <dl>
-                        <div><dt>Flight</dt><dd>{{ $flight->flight_number }}</dd></div>
-                        <div><dt>Seat</dt><dd>{{ $ticket->seat?->seat_number ?? 'Unassigned' }}</dd></div>
-                        <div><dt>Date</dt><dd>{{ $flight->departure_at->format('d M') }}</dd></div>
-                        <div><dt>Time</dt><dd>{{ $flight->departure_at->format('H:i') }}</dd></div>
+                        <div><dt>{{ __('Flight') }}</dt><dd>{{ $flight->flight_number }}</dd></div>
+                        <div><dt>{{ __('Seat') }}</dt><dd>{{ $ticket->seat?->seat_number ?? 'Unassigned' }}</dd></div>
+                        <div><dt>{{ __('Date') }}</dt><dd>{{ $flight->departure_at->format('d M') }}</dd></div>
+                        <div><dt>{{ __('Time') }}</dt><dd>{{ $flight->departure_at->format('H:i') }}</dd></div>
                     </dl>
                     <p class="ticket-id">{{ $ticket->ticket_number }}</p>
                 </section>
             </aside>
         </article>
     </main>
-    <x-assistant-shortcut />
+    @unless(request()->is('admin', 'admin/*', 'airline', 'airline/*'))
+        <x-assistant-shortcut />
+    @endunless
     <script>
         function ticketPdf(canvas) {
             const jpeg = Uint8Array.from(atob(canvas.toDataURL('image/jpeg', .95).split(',')[1]), byte => byte.charCodeAt(0));

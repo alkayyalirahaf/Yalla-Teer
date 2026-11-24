@@ -29,7 +29,7 @@ class AirportController
             ->when($cityId !== false, fn ($query) => $query->where('city_id', $cityId))
             ->orderBy('name')
             ->orderBy('code')
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('admin.airports.index', [

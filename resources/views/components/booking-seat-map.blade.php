@@ -10,14 +10,14 @@
 
 <div class="table-wrap booking-cabin">
     <div class="booking-cabin-shell">
-    <div class="booking-cabin-end booking-cabin-front">Front of aircraft</div>
+    <div class="booking-cabin-end booking-cabin-front">{{ __('Front of aircraft') }}</div>
     <table>
         <caption>{{ $caption }}</caption>
         <thead>
             <tr>
-                <th scope="col"><span class="sr-only">Row</span></th>
+                <th scope="col"><span class="sr-only">{{ __('Row') }}</span></th>
                 @foreach($columns as $column)
-                    <th scope="col">@if($column){{ $column }}@else<span class="sr-only">Aisle</span>@endif</th>
+                    <th scope="col">@if($column){{ $column }}@else<span class="sr-only">{{ __('Aisle') }}</span>@endif</th>
                 @endforeach
                 <td aria-hidden="true"></td>
             </tr>
@@ -45,9 +45,9 @@
             @endforeach
         </tbody>
     </table>
-    <div class="booking-cabin-end booking-cabin-rear">Rear of aircraft</div>
+    <div class="booking-cabin-end booking-cabin-rear">{{ __('Rear of aircraft') }}</div>
     </div>
     <div class="booking-cabin-legend">
-        <span>Available</span><span>Selected</span><span>Unavailable</span>
+        <span>{{ __('Available') }}</span><span>{{ __('Selected') }}</span><span>{{ __('Unavailable') }}</span>
     </div>
 </div>

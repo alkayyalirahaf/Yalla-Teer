@@ -27,7 +27,7 @@ class FlightController
                 $query->where('status', $request->status);
             })
             ->latest('departure_at')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         return view('airline.flights.index', compact('flights'));

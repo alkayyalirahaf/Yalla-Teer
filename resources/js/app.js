@@ -56,11 +56,12 @@ document.querySelectorAll('[data-compare]').forEach((form) => {
     const submit = form.querySelector('button[type="submit"]');
 
     if (!status) return;
+    const initialMessage = status.textContent;
 
     const update = () => {
         const selected = choices.filter((choice) => choice.checked).length;
         submit.disabled = selected < 2;
-        status.textContent = selected ? `${selected} selected (choose 2 or 3).` : 'Select 2 or 3 flights.';
+        status.textContent = selected ? status.dataset.selected.replace(':count', selected) : initialMessage;
         for (const choice of choices) {
             choice.disabled = !choice.checked && selected >= 3;
         }
@@ -70,7 +71,7 @@ document.querySelectorAll('[data-compare]').forEach((form) => {
     form.addEventListener('submit', (event) => {
         if (choices.filter((choice) => choice.checked).length < 2) {
             event.preventDefault();
-            status.textContent = 'Select at least two flights to compare.';
+            status.textContent = status.dataset.minimum;
         }
     });
     update();
@@ -123,3 +124,9 @@ document.querySelectorAll('[data-seat-picker]').forEach((picker) => {
     picker.classList.add('seat-picker-ready');
     update();
 });
+
+if (window.matchMedia('(max-width: 48rem)').matches) {
+    document.querySelectorAll('[data-management-filters][data-active="0"]').forEach(panel => { panel.open = false; });
+}
+
+

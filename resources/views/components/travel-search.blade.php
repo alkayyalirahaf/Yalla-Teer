@@ -22,7 +22,7 @@
     <x-travel-field name="cabin" label="Cabin" :value="$filters['cabin'] ?? ''" :options="['' => 'Any cabin', 'economy' => 'Economy', 'business' => 'Business', 'first' => 'First']" />
     <x-travel-field name="budget" label="Max fare (JOD)" type="number" min="0" step="0.01" :value="$filters['budget'] ?? null" />
     <fieldset class="wide traveler-fields">
-        <legend>Travelers</legend>
+        <legend>{{ __('Travelers') }}</legend>
         <div class="form-grid">
             @foreach($travelers as $name => [$label, $minimum, $default])
                 @php
@@ -36,5 +36,5 @@
         <x-travel-field name="stops" label="Stops" :value="$filters['stops'] ?? ''" :options="['' => 'Any', 0 => 'Nonstop', 1 => '1 stop', 2 => '2 stops']" />
         <x-travel-field name="sort" label="Sort by departure" :value="$filters['sort'] ?? 'earliest'" :options="['earliest' => 'Earliest first', 'latest' => 'Latest first']" />
     @endif
-    <div class="wide"><button class="button">Find flights</button></div>
+    <div class="wide"><button class="button">{{ __('Find flights') }}</button></div>
 </form>

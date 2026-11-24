@@ -1,25 +1,25 @@
 @extends('airline-admin.flights.layout')
 
-@section('title', 'Edit Flight')
+@section('title', __('Edit Flight'))
 
 @section('flight-content')
-<h1>Edit Flight {{ $flight->flight_number }}</h1>
+<h1>{{ __('Edit Flight') }} {{ $flight->flight_number }}</h1>
 <form method="POST" action="{{ route('airline.update', $flight) }}" class="stack">
     @csrf
     @method('PUT')
 
     <section class="panel stack">
-        <h2>Flight details</h2>
+        <h2>{{ __('Flight details') }}</h2>
         <div class="form-grid">
             <label class="field">
-                <span>Flight number</span>
+                <span>{{ __('Flight number') }}</span>
                 <input type="text" name="flight_number" value="{{ old('flight_number', $flight->flight_number) }}" maxlength="10" required>
                 @error('flight_number')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Origin airport</span>
+                <span>{{ __('Origin airport') }}</span>
                 <select name="origin_airport_id" required>
-                    <option value="">Select an airport</option>
+                    <option value="">{{ __('Select an airport') }}</option>
                     @foreach($airports as $airport)
                         <option value="{{ $airport->id }}" @selected((string) old('origin_airport_id', $flight->origin_airport_id) === (string) $airport->id)>
                             {{ $airport->code }} — {{ $airport->name }}{{ $airport->city ? ', '.$airport->city->name : '' }}
@@ -29,9 +29,9 @@
                 @error('origin_airport_id')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Destination airport</span>
+                <span>{{ __('Destination airport') }}</span>
                 <select name="destination_airport_id" required>
-                    <option value="">Select an airport</option>
+                    <option value="">{{ __('Select an airport') }}</option>
                     @foreach($airports as $airport)
                         <option value="{{ $airport->id }}" @selected((string) old('destination_airport_id', $flight->destination_airport_id) === (string) $airport->id)>
                             {{ $airport->code }} — {{ $airport->name }}{{ $airport->city ? ', '.$airport->city->name : '' }}
@@ -41,25 +41,25 @@
                 @error('destination_airport_id')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Departure</span>
+                <span>{{ __('Departure') }}</span>
                 <input type="datetime-local" name="departure_at" min="{{ now()->format('Y-m-d\TH:i') }}" value="{{ old('departure_at', $flight->departure_at->format('Y-m-d\TH:i')) }}" required>
                 @error('departure_at')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Arrival</span>
+                <span>{{ __('Arrival') }}</span>
                 <input type="datetime-local" name="arrival_at" min="{{ now()->format('Y-m-d\TH:i') }}" value="{{ old('arrival_at', $flight->arrival_at->format('Y-m-d\TH:i')) }}" required>
                 @error('arrival_at')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Stops</span>
+                <span>{{ __('Stops') }}</span>
                 <input type="number" name="stops" value="{{ old('stops', $flight->stops) }}" min="0" max="10" required>
                 @error('stops')<small class="error">{{ $message }}</small>@enderror
             </label>
             <label class="field">
-                <span>Status</span>
+                <span>{{ __('Status') }}</span>
                 <select name="status" required>
                     @foreach(['scheduled', 'delayed', 'cancelled', 'completed'] as $status)
-                        <option value="{{ $status }}" @selected(old('status', $flight->status) === $status)>{{ ucfirst($status) }}</option>
+                        <option value="{{ $status }}" @selected(old('status', $flight->status) === $status)>{{ __(ucfirst($status)) }}</option>
                     @endforeach
                 </select>
                 @error('status')<small class="error">{{ $message }}</small>@enderror
@@ -80,8 +80,8 @@
     @endphp
     <section class="panel stack" data-cabins>
         <div class="flight-card">
-            <div><h2>Cabin classes</h2><p>Set fares, baggage allowance, and capacity for each cabin.</p></div>
-            <button type="button" class="quiet" data-add-cabin>Add cabin class</button>
+            <div><h2>{{ __('Cabin classes') }}</h2><p>{{ __('Set fares, baggage allowance, and capacity for each cabin.') }}</p></div>
+            <button type="button" class="quiet" data-add-cabin>{{ __('Add cabin class') }}</button>
         </div>
         @error('classes')<p class="notice error" role="alert">{{ $message }}</p>@enderror
 
@@ -92,75 +92,75 @@
                         <input type="hidden" name="classes[{{ $index }}][id]" value="{{ $classData['id'] }}">
                     @endif
                     <div class="flight-card">
-                        <h3>Cabin class</h3>
-                        <button type="button" class="quiet" data-remove-cabin>Remove</button>
+                        <h3>{{ __('Cabin class') }}</h3>
+                        <button type="button" class="button danger" data-remove-cabin>{{ __('Remove') }}</button>
                     </div>
                     <div class="form-grid">
                         <label class="field">
-                            <span>Class</span>
+                            <span>{{ __('Class') }}</span>
                             <select name="classes[{{ $index }}][class]" required>
                                 @foreach(['economy', 'business', 'first'] as $className)
-                                    <option value="{{ $className }}" @selected(($classData['class'] ?? '') === $className)>{{ ucfirst($className) }}</option>
+                                    <option value="{{ $className }}" @selected(($classData['class'] ?? '') === $className)>{{ __(ucfirst($className)) }}</option>
                                 @endforeach
                             </select>
                             @error("classes.$index.class")<small class="error">{{ $message }}</small>@enderror
                         </label>
                         <label class="field">
-                            <span>Price</span>
+                            <span>{{ __('Price') }}</span>
                             <input type="number" name="classes[{{ $index }}][price]" value="{{ $classData['price'] ?? '' }}" min="1" step="0.01" required>
                             @error("classes.$index.price")<small class="error">{{ $message }}</small>@enderror
                         </label>
                         <label class="field">
-                            <span>Seat rows</span>
+                            <span>{{ __('Seat rows') }}</span>
                             <input type="number" name="classes[{{ $index }}][seat_rows]" value="{{ $classData['seat_rows'] ?? 10 }}" min="1" max="100" required data-seat-rows>
                             @error("classes.$index.seat_rows")<small class="error">{{ $message }}</small>@enderror
                         </label>
                         <label class="field">
-                            <span>Seats per row</span>
+                            <span>{{ __('Seats per row') }}</span>
                             <input type="number" name="classes[{{ $index }}][seats_per_row]" value="{{ $classData['seats_per_row'] ?? 6 }}" min="1" max="10" required data-seats-per-row>
                             @error("classes.$index.seats_per_row")<small class="error">{{ $message }}</small>@enderror
                         </label>
                         <label class="field">
-                            <span>Cabin baggage (kg)</span>
+                            <span>{{ __('Cabin baggage (kg)') }}</span>
                             <input type="number" name="classes[{{ $index }}][cabin_baggage_kg]" value="{{ $classData['cabin_baggage_kg'] ?? 7 }}" min="0" max="100" required>
                             @error("classes.$index.cabin_baggage_kg")<small class="error">{{ $message }}</small>@enderror
                         </label>
                         <label class="field">
-                            <span>Checked baggage (kg)</span>
+                            <span>{{ __('Checked baggage (kg)') }}</span>
                             <input type="number" name="classes[{{ $index }}][checked_baggage_kg]" value="{{ $classData['checked_baggage_kg'] ?? 23 }}" min="0" max="100" required>
                             @error("classes.$index.checked_baggage_kg")<small class="error">{{ $message }}</small>@enderror
                         </label>
                     </div>
-                    <p>Total seats in this class: <strong data-row-total>0</strong></p>
-                    <div class="stack"><h3>Seat map preview</h3><div class="table-wrap" data-seat-map aria-live="polite"></div></div>
+                    <p>{{ __('Total seats in this class:') }} <strong data-row-total>0</strong></p>
+                    <div class="stack"><h3>{{ __('Seat map preview') }}</h3><div class="table-wrap" data-seat-map aria-live="polite"></div></div>
                 </article>
             @endforeach
         </div>
-        <p class="notice">Total seats across cabin classes: <strong data-total-seats aria-live="polite">0</strong></p>
+        <p class="notice">{{ __('Total seats across cabin classes:') }} <strong data-total-seats aria-live="polite">0</strong></p>
     </section>
 
     <template data-cabin-template>
         <article class="panel stack" data-cabin-row data-index="__INDEX__">
             <div class="flight-card">
-                <h3>Cabin class</h3>
-                <button type="button" class="quiet" data-remove-cabin>Remove</button>
+                <h3>{{ __('Cabin class') }}</h3>
+                <button type="button" class="button danger" data-remove-cabin>{{ __('Remove') }}</button>
             </div>
             <div class="form-grid">
-                <label class="field"><span>Class</span><select name="classes[__INDEX__][class]" required><option value="economy">Economy</option><option value="business">Business</option><option value="first">First</option></select></label>
-                <label class="field"><span>Price</span><input type="number" name="classes[__INDEX__][price]" min="1" step="0.01" required></label>
-                <label class="field"><span>Seat rows</span><input type="number" name="classes[__INDEX__][seat_rows]" value="10" min="1" max="100" required data-seat-rows></label>
-                <label class="field"><span>Seats per row</span><input type="number" name="classes[__INDEX__][seats_per_row]" value="6" min="1" max="10" required data-seats-per-row></label>
-                <label class="field"><span>Cabin baggage (kg)</span><input type="number" name="classes[__INDEX__][cabin_baggage_kg]" value="7" min="0" max="100" required></label>
-                <label class="field"><span>Checked baggage (kg)</span><input type="number" name="classes[__INDEX__][checked_baggage_kg]" value="23" min="0" max="100" required></label>
+                <label class="field"><span>{{ __('Class') }}</span><select name="classes[__INDEX__][class]" required><option value="economy">{{ __('Economy') }}</option><option value="business">{{ __('Business') }}</option><option value="first">{{ __('First') }}</option></select></label>
+                <label class="field"><span>{{ __('Price') }}</span><input type="number" name="classes[__INDEX__][price]" min="1" step="0.01" required></label>
+                <label class="field"><span>{{ __('Seat rows') }}</span><input type="number" name="classes[__INDEX__][seat_rows]" value="10" min="1" max="100" required data-seat-rows></label>
+                <label class="field"><span>{{ __('Seats per row') }}</span><input type="number" name="classes[__INDEX__][seats_per_row]" value="6" min="1" max="10" required data-seats-per-row></label>
+                <label class="field"><span>{{ __('Cabin baggage (kg)') }}</span><input type="number" name="classes[__INDEX__][cabin_baggage_kg]" value="7" min="0" max="100" required></label>
+                <label class="field"><span>{{ __('Checked baggage (kg)') }}</span><input type="number" name="classes[__INDEX__][checked_baggage_kg]" value="23" min="0" max="100" required></label>
             </div>
-            <p>Total seats in this class: <strong data-row-total>0</strong></p>
-            <div class="stack"><h3>Seat map preview</h3><div class="table-wrap" data-seat-map aria-live="polite"></div></div>
+            <p>{{ __('Total seats in this class:') }} <strong data-row-total>0</strong></p>
+            <div class="stack"><h3>{{ __('Seat map preview') }}</h3><div class="table-wrap" data-seat-map aria-live="polite"></div></div>
         </article>
     </template>
 
     <div class="actions">
-        <button type="submit" class="button">Save Changes</button>
-        <a class="button secondary" href="{{ route('airline.flight', $flight) }}">Cancel</a>
+        <button type="submit" class="button">{{ __('Save Changes') }}</button>
+        <a class="button secondary" href="{{ route('airline.flight', $flight) }}">{{ __('Cancel') }}</a>
     </div>
 </form>
 

@@ -1,8 +1,8 @@
 @props(['interactive' => false])
 <div class="table-wrap">
     <table class="seats">
-        <caption>Sample seat map</caption>
-        <thead><tr><th scope="col">Row</th>@foreach(['A', 'B', 'C', 'D'] as $column)<th scope="col">{{ $column }}</th>@endforeach</tr></thead>
+        <caption>{{ __('Sample seat map') }}</caption>
+        <thead><tr><th scope="col">{{ __('Row') }}</th>@foreach(['A', 'B', 'C', 'D'] as $column)<th scope="col">{{ $column }}</th>@endforeach</tr></thead>
         <tbody>
             @foreach(range(1, 4) as $row)
                 <tr><th scope="row">{{ $row }}</th>

@@ -23,7 +23,7 @@ class AiConversationController
             })
             ->when($filters['type'] ?? null, fn ($query, $type) => $query->where('type', $type))
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.ai-conversations.index', compact('conversations', 'filters'));

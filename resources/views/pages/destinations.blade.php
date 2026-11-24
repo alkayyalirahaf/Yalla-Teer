@@ -39,16 +39,16 @@
                         @endif
                     </div>
                     <div class="directory-copy">
-                        <p class="directory-country">{{ $country->name }}</p>
-                        <h2>{{ $city->name }}</h2>
-                        @if($city->best_season)<p><strong>Best season:</strong> {{ $city->best_season }}</p>@endif
-                        @if($city->airport_transport)<p><strong>Airport transport:</strong> {{ $city->airport_transport }}</p>@endif
-                        @if($city->tips)<p><strong>Travel tips:</strong> {{ $city->tips }}</p>@endif
+                        <p class="directory-country">{{ __($country->name) }}</p>
+                        <h2>{{ __($city->name) }}</h2>
+                        @if($city->best_season)<p><strong>{{ __('Best season:') }}</strong> {{ __($city->best_season) }}</p>@endif
+                        @if($city->airport_transport)<p><strong>{{ __('Airport transport:') }}</strong> {{ __($city->airport_transport) }}</p>@endif
+                        @if($city->tips)<p><strong>{{ __('Travel tips:') }}</strong> {{ __($city->tips) }}</p>@endif
                         @if($city->airports->isNotEmpty())
-                            <h3>Airports</h3>
+                            <h3>{{ __('Airports') }}</h3>
                             <ul>
                                 @foreach($city->airports as $airport)
-                                    <li>{{ $airport->name }} ({{ $airport->code }})</li>
+                                    <li>{{ __($airport->name) }} ({{ $airport->code }})</li>
                                 @endforeach
                             </ul>
                         @endif
@@ -58,7 +58,7 @@
             @endforeach
         </div>
     @else
-        <p>Destination information will be available soon.</p>
+        <p>{{ __('Destination information will be available soon.') }}</p>
     @endif
 </div>
 @endsection
