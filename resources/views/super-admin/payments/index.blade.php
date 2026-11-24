@@ -5,21 +5,32 @@
 @section('admin-content')
     <h1>Payments</h1>
 
-    <form method="GET" action="{{ route('admin.payments') }}" class="row g-2 mb-3 align-items-end">
-        <div class="col-md-6">
-            <input class="form-control" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search booking code or Stripe payment intent">
+    <details class="card mb-3" open>
+        <summary class="card-header fw-semibold">Search and filters</summary>
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.payments') }}" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label" for="payment-search">Search</label>
+                    <input id="payment-search" class="form-control" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search booking code or Stripe payment intent">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="payment-status">Status</label>
+                    <select id="payment-status" class="form-select" name="status">
+                        <option value="">All statuses</option>
+                        @foreach(['pending', 'succeeded', 'failed'] as $status)
+                            <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ ucfirst($status) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary" type="submit">Apply filters</button>
+                        <a class="btn btn-outline-secondary" href="{{ route('admin.payments') }}">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="col-md-3">
-            <select class="form-select" name="status">
-                <option value="">All statuses</option>
-                @foreach(['pending', 'succeeded', 'failed'] as $status)
-                    <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ ucfirst($status) }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Filter</button></div>
-        <div class="col-auto"><a class="btn btn-outline-secondary" href="{{ route('admin.payments') }}">Clear</a></div>
-    </form>
+    </details>
 
     <div class="table-responsive">
         <table class="table table-striped align-middle">

@@ -10,6 +10,10 @@
         'TK' => 'https://w0.peakpx.com/wallpaper/547/707/HD-wallpaper-turkish-airlines-boeing-737-airbus-a321-turkish-airlines-logo-on-empennage-passenger-airplanes-red-tails-with-logo-airport-turkey-turkish-airlines-logo.jpg',
         default => null,
     };
+    $currencyNames = ['JOD' => 'Jordanian Dinar', 'AED' => 'UAE Dirham', 'EGP' => 'Egyptian Pound', 'TRY' => 'Turkish Lira', 'SAR' => 'Saudi Riyal', 'QAR' => 'Qatari Riyal', 'GBP' => 'British Pound', 'EUR' => 'Euro', 'THB' => 'Thai Baht', 'JPY' => 'Japanese Yen', 'USD' => 'US Dollar'];
+    $destinationCountry = $flight->destinationAirport?->city?->country;
+    $destinationCurrency = $destinationCountry?->currency;
+    $destinationCurrencyLabel = $destinationCurrency ? ($destinationCurrency.(isset($currencyNames[$destinationCurrency]) ? ' - '.$currencyNames[$destinationCurrency] : '')) : null;
 @endphp
 <h1 class="flight-page-title">{{ $flight->flight_number }}</h1>
 <div class="panel">
@@ -17,6 +21,9 @@
     <h2 class="section">{{ $flight->originAirport->name }} ({{ $flight->originAirport->code }}) → {{ $flight->destinationAirport->name }} ({{ $flight->destinationAirport->code }})</h2>
     <p>{{ $flight->departure_at->format('Y-m-d H:i') }} → {{ $flight->arrival_at->format('Y-m-d H:i') }} · {{ (int) $flight->departure_at->diffInMinutes($flight->arrival_at) }} minutes</p>
     <p>Times use {{ config('app.timezone') }}. Prices are per-seat base fares.</p>
+    @if($destinationCurrencyLabel)
+        <p><strong>Destination currency note:</strong> {{ $destinationCountry->name }} uses {{ $destinationCurrencyLabel }}.</p>
+    @endif
 </div>
 @if($fleetPhoto)
     <figure class="flight-fleet-photo" data-airline-photo>

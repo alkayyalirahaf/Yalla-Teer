@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AirlineAdmin;
 
 use App\Models\Airport;
 use App\Models\Flight;
+use App\Models\FlightClass;
 use App\Services\FlightInventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -21,7 +22,7 @@ class FlightController
         $flights = Flight::where('airline_id', $airlineId)
             ->with(['originAirport', 'destinationAirport', 'flightClasses'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('flight_number', 'like', '%' . $request->search . '%');
+                $query->where('flight_number', 'like', '%'.$request->search.'%');
             })
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
@@ -36,7 +37,15 @@ class FlightController
     public function create()
     {
         $airports = Airport::with('city')->orderBy('code')->get();
-        return view('airline.flights.create', compact('airports'));
+        $airline = auth()->user()->airlineAdmin->airline;
+        $layoutPresets = FlightClass::query()
+            ->select('class', 'seat_rows', 'seats_per_row', 'cabin_baggage_kg', 'checked_baggage_kg')
+            ->distinct()
+            ->orderBy('class')
+            ->orderByDesc('seat_rows')
+            ->get();
+
+        return view('airline.flights.create', compact('airports', 'airline', 'layoutPresets'));
     }
 
     public function store(Request $request)
@@ -89,8 +98,15 @@ class FlightController
 
         $flight->load('flightClasses');
         $airports = Airport::with('city')->orderBy('code')->get();
+        $airline = auth()->user()->airlineAdmin->airline;
+        $layoutPresets = FlightClass::query()
+            ->select('class', 'seat_rows', 'seats_per_row', 'cabin_baggage_kg', 'checked_baggage_kg')
+            ->distinct()
+            ->orderBy('class')
+            ->orderByDesc('seat_rows')
+            ->get();
 
-        return view('airline.flights.edit', compact('flight', 'airports'));
+        return view('airline.flights.edit', compact('flight', 'airports', 'airline', 'layoutPresets'));
     }
 
     public function update(Request $request, Flight $flight)

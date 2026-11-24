@@ -5,24 +5,37 @@
 @section('content')
 <div class="flight-search-page">
     <h1 class="flight-page-title">Find flights</h1>
-    <div class="panel flight-search-panel">
-        <x-landing-search />
-    </div>
-    @if($flights !== null)
-        <section class="panel flight-filter-panel" aria-labelledby="flight-filter-title">
-        <h2 id="flight-filter-title">Filter results</h2>
-        <form method="GET" action="{{ route('flights.search') }}" class="search-refinements">
-            @foreach($filters as $key => $value)
-                @if($value !== null && !in_array($key, ['sort', 'min_price', 'budget']))
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endif
-            @endforeach
-            <x-travel-field name="min_price" label="Minimum fare (JOD)" type="number" min="0" step="0.01" :value="$filters['min_price'] ?? null" />
-            <x-travel-field name="budget" label="Maximum fare (JOD)" type="number" min="0" step="0.01" placeholder="No limit" :value="$filters['budget'] ?? null" />
-            <x-travel-field name="sort" label="Sort flights" :value="$filters['sort']" :options="['departure_asc' => 'Earliest departure', 'departure_desc' => 'Latest departure', 'price_asc' => 'Lowest price', 'price_desc' => 'Highest price']" />
-            <button class="button" type="submit">Apply filters</button>
-        </form>
-        </section>
+    @if($flights === null)
+        <div class="panel flight-search-panel">
+            <x-landing-search class="landing-search" />
+        </div>
+    @else
+        <details class="panel flight-search-panel" open>
+            <summary><strong>Search, filters, and sort</strong></summary>
+            <div class="stack" style="margin-top:1rem">
+                <section aria-labelledby="flight-search-title">
+                    <h2 id="flight-search-title">Search</h2>
+                    <x-landing-search class="landing-search" />
+                </section>
+                <section aria-labelledby="flight-filter-title">
+                    <h2 id="flight-filter-title">Filter and sort results</h2>
+                    <form method="GET" action="{{ route('flights.search') }}" class="search-refinements">
+                        @foreach($filters as $key => $value)
+                            @if($value !== null && !in_array($key, ['sort', 'min_price', 'budget']))
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
+                        @endforeach
+                        <x-travel-field name="min_price" label="Minimum fare (JOD)" type="number" min="0" step="0.01" :value="$filters['min_price'] ?? null" />
+                        <x-travel-field name="budget" label="Maximum fare (JOD)" type="number" min="0" step="0.01" placeholder="No limit" :value="$filters['budget'] ?? null" />
+                        <x-travel-field name="sort" label="Sort flights" :value="$filters['sort']" :options="['departure_asc' => 'Earliest departure', 'departure_desc' => 'Latest departure', 'price_asc' => 'Lowest price', 'price_desc' => 'Highest price']" />
+                        <div class="actions">
+                            <button class="button" type="submit">Apply filters</button>
+                            <a class="button secondary" href="{{ route('flights.search', array_merge($filters, ['min_price' => null, 'budget' => null, 'sort' => 'departure_asc'])) }}">Reset</a>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </details>
     @endif
     @if($flights !== null)
         <header class="flight-results-heading">

@@ -13,7 +13,7 @@
             ['Airlines', 'admin.airlines', '✈'],
             ['Airline Admins', 'admin.airline-admins', '♙'],
             ['Customers', 'admin.customers', '♧'],
-            ['Countries', 'admin.countries', '◎'],
+            ['Destinations', 'admin.countries', '◎'],
             ['Credits', 'admin.credits', '$'],
             ['Airports', 'admin.airports', '⌖'],
             ['Flights', 'admin.flights', '⇄'],

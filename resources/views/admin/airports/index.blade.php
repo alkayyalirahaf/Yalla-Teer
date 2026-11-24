@@ -8,25 +8,32 @@
     <a class="btn btn-primary px-4 py-2" href="{{ route('admin.airports.create') }}">Create airport</a>
 </div>
 
-<form action="{{ route('admin.airports') }}" method="GET" class="panel p-3 mb-3 row g-3 align-items-end">
-    <div class="col-md-5">
-        <label class="form-label" for="search">Search name or IATA code</label>
-        <input class="form-control" id="search" name="search" value="{{ $filters['search'] }}">
+<details class="card mb-3" open>
+    <summary class="card-header fw-semibold">Search and filters</summary>
+    <div class="card-body">
+        <form action="{{ route('admin.airports') }}" method="GET" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label" for="search">Search name or IATA code</label>
+                <input class="form-control" id="search" name="search" value="{{ $filters['search'] }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="city_id">City</label>
+                <select class="form-select" id="city_id" name="city_id">
+                    <option value="">All cities</option>
+                    @foreach($cities as $city)
+                        <option value="{{ $city->id }}" @selected((string) $filters['city_id'] === (string) $city->id)>{{ $city->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-primary" type="submit">Apply filters</button>
+                    <a class="btn btn-outline-secondary" href="{{ route('admin.airports') }}">Reset</a>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="col-md-4">
-        <label class="form-label" for="city_id">City</label>
-        <select class="form-select" id="city_id" name="city_id">
-            <option value="">All cities</option>
-            @foreach($cities as $city)
-                <option value="{{ $city->id }}" @selected((string) $filters['city_id'] === (string) $city->id)>{{ $city->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="col-md-3 d-flex gap-2">
-        <button class="btn btn-primary" type="submit">Filter</button>
-        <a class="btn btn-outline-secondary" href="{{ route('admin.airports') }}">Clear</a>
-    </div>
-</form>
+</details>
 
 <div class="table-responsive">
     <table class="table table-striped align-middle">

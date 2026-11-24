@@ -6,19 +6,32 @@
         <a class="btn btn-primary px-4 py-2" href="{{ route('admin.airlines.create') }}">Add airline</a>
     </div>
 
-    <form method="GET" action="{{ route('admin.airlines') }}" class="row g-2 mb-3 align-items-end">
-        <div class="col-md-6"><input class="form-control" name="search" value="{{ request('search') }}" placeholder="Search name or code"></div>
-        <div class="col-md-3">
-            <select class="form-select" name="status">
-                <option value="">All statuses</option>
-                @foreach (['pending', 'active', 'suspended'] as $status)
-                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
-                @endforeach
-            </select>
+    <details class="card mb-3" open>
+        <summary class="card-header fw-semibold">Search and filters</summary>
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.airlines') }}" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label" for="airline-search">Search name or code</label>
+                    <input id="airline-search" class="form-control" name="search" value="{{ request('search') }}" placeholder="Search name or code">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="airline-status">Status</label>
+                    <select id="airline-status" class="form-select" name="status">
+                        <option value="">All statuses</option>
+                        @foreach (['pending', 'active', 'suspended'] as $status)
+                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary" type="submit">Apply filters</button>
+                        <a class="btn btn-outline-secondary" href="{{ route('admin.airlines') }}">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="col-auto"><button class="btn btn-outline-primary">Filter</button></div>
-        <div class="col-auto"><a class="btn btn-outline-secondary" href="{{ route('admin.airlines') }}">Clear</a></div>
-    </form>
+    </details>
 
     <div class="table-responsive"><table class="table table-striped align-middle">
         <thead><tr><th>Logo</th><th>Name</th><th>Code</th><th>Country</th><th>Status</th><th>Actions</th></tr></thead>

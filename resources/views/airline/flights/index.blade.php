@@ -8,25 +8,28 @@
     <a class="button" href="{{ route('airline.create') }}">Create Flight</a>
 </div>
 
-<form method="GET" action="{{ route('airline.flights') }}" class="panel form-grid section">
-    <label class="field">
-        <span>Flight number</span>
-        <input type="search" name="search" value="{{ request('search') }}" placeholder="Search flight number">
-    </label>
-    <label class="field">
-        <span>Status</span>
-        <select name="status">
-            <option value="">All statuses</option>
-            @foreach(['scheduled', 'delayed', 'cancelled', 'completed'] as $status)
-                <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
-            @endforeach
-        </select>
-    </label>
-    <div class="actions">
-        <button class="button" type="submit">Filter</button>
-        <a class="button secondary" href="{{ route('airline.flights') }}">Clear</a>
-    </div>
-</form>
+<details class="panel section" open>
+    <summary><strong>Search and filters</strong></summary>
+    <form method="GET" action="{{ route('airline.flights') }}" class="form-grid" style="margin-top:1rem">
+        <label class="field">
+            <span>Flight number</span>
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search flight number">
+        </label>
+        <label class="field">
+            <span>Status</span>
+            <select name="status">
+                <option value="">All statuses</option>
+                @foreach(['scheduled', 'delayed', 'cancelled', 'completed'] as $status)
+                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                @endforeach
+            </select>
+        </label>
+        <div class="actions" style="align-self:end">
+            <button class="button" type="submit">Apply filters</button>
+            <a class="button secondary" href="{{ route('airline.flights') }}">Reset</a>
+        </div>
+    </form>
+</details>
 
 <section class="panel table-wrap section">
     <table>
