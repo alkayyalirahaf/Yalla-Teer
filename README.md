@@ -1,8 +1,6 @@
 # Yalla Teer
 
-**Chosen project option:** An airline travel booking and management platform.
-
-Yalla Teer is a Laravel web application for discovering and comparing flights, booking travel, and managing airline operations. It includes customer, airline administrator, and super administrator workflows.
+Yalla Teer is a flight reservation platform built with Laravel 12, Blade, Tailwind CSS, and MySQL. Travelers can search and compare flights, enter passenger details, choose seats, and complete checkout. Airline staff manage flights and seat inventory, and platform administrators oversee airlines, bookings, and payments.
 
 ## Features
 
@@ -17,89 +15,71 @@ Yalla Teer is a Laravel web application for discovering and comparing flights, b
 - Review moderation, customer credit history, contact messages, and notification logs.
 - Responsive Blade interface with Yalla Teer branding.
 
-## Requirements
+## Local setup
 
-- PHP 8.2 or later and the PHP extensions required by Laravel 12.
-- Composer.
-- SQLite (the default local database) or another Laravel-supported database.
-- Node.js and npm to build the frontend assets.
-- A Google Gemini API key to enable Gemini features. The application can run without it, but the Gemini assistant and passport extraction will be unavailable.
+Use PHP 8.2 or later with `pdo_mysql`, Composer, Node.js with npm, and a running MySQL server. If you use XAMPP, start MySQL from its control panel.
 
-## Setup
+1. From the project folder, install dependencies and create `.env` if it does not already exist. The copy command below uses PowerShell.
 
-Clone the repository and enter the project directory. Then install the PHP dependencies:
-
-```bash
-composer install
-```
-
-Create your environment file. On macOS/Linux/Git Bash:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-### Configure the environment
-
-The default `.env.example` uses SQLite. Create the SQLite database file if it does not exist:
-
-```bash
-touch database/database.sqlite
-```
-
-On Windows PowerShell:
-
-```powershell
-New-Item -ItemType File -Force database/database.sqlite
-```
-
-To use MySQL or PostgreSQL instead, update the `DB_*` values in `.env` and create the database before migrating.
-
-To enable the Gemini assistant and passport extraction:
-
-1. Create an API key in [Google AI Studio](https://aistudio.google.com/app/apikey).
-2. Add the key to `.env`:
-
-   ```dotenv
-   GEMINI_API_KEY=your-google-gemini-api-key
-   GEMINI_MODEL=gemini-3.1-flash-lite
+   ```powershell
+   composer install
+   if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+   npm ci
    ```
 
-Keep the key server-side in `.env`. Do not add a `VITE_` prefix, commit the key, or expose it in browser code. After changing configuration, run `php artisan config:clear`.
+2. Create a local MySQL database named `yallaTeer` and update `.env` with your local credentials. Set `DB_PASSWORD` to your MySQL password if your account uses one.
 
-For Stripe payments, set `STRIPE_KEY`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET` in `.env` and configure a Stripe webhook for the application's webhook endpoint.
+   ```dotenv
+   APP_URL=http://127.0.0.1:8011
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=yallaTeer
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-### Generate the application key, migrate, and seed
+3. If you just created `.env`, run `php artisan key:generate`. Then migrate and seed the database, build assets, and start Laravel.
 
-```bash
-php artisan key:generate
-php artisan migrate --seed
-```
+   ```powershell
+   php artisan config:clear
+   php artisan migrate --seed
+   npm run build
+   php artisan serve --port=8011
+   ```
 
-In the local environment, the database seeder adds demo data for development. Demo account emails and the shared demo password are documented in [`docs/demo-data.md`](docs/demo-data.md). Do not use demo credentials in production. Seeded records are fictional test fixtures.
+   Open [Yalla Teer locally](http://127.0.0.1:8011/).
 
-### Build frontend assets
+### SQLite alternative
 
-```bash
-npm install
-npm run build
-```
+The default `.env.example` uses SQLite. To use it for local development, keep `DB_CONNECTION=sqlite` and create an empty `database/database.sqlite` if it does not exist. Enable `pdo_sqlite`, then follow the same key generation, migration, seeding, build, and serve steps above.
 
-During frontend development, use `npm run dev` in a separate terminal instead of the production build.
+## Demo accounts
 
-### Start the application
+The local demo accounts share the password `FlyNow-Demo-2026!`.
 
-```bash
-php artisan serve
-```
+| Role | Email |
+| --- | --- |
+| Traveler | `traveler@demo.example.test` |
+| Royal Jordanian staff | `staff.rj@demo.example.test` |
+| Emirates staff | `staff.ek@demo.example.test` |
+| Turkish Airlines staff | `staff.tk@demo.example.test` |
+| Platform administrator | `admin@demo.example.test` |
 
-Open [http://localhost:8000](http://localhost:8000).
+## Booking demo
+
+1. Sign in as the demo traveler and search for **Amman (AMM) → Dubai (DXB)**. On a freshly seeded database, choose tomorrow for departure and four days after departure for the default return. For a one-way booking, choose **One Way** and leave the return date blank.
+2. Select Royal Jordanian flight `RJD000O` in **Economy**. For a round trip, select return flight `RJD000R` in **Economy**. The seeder may use an earlier matching return already in the database for its sample booking.
+3. Enter the traveler and booking contact details, then continue to **Select seats**. The demo booking marks `1A`–`1E` on the outbound and `1A`–`1C` on its selected return as unavailable in a fresh seed. Choose an available seat for each traveler on each leg. The selected seats are held for 15 minutes after you continue.
+4. Review the itinerary and fare. With Stripe test credentials configured, continue to checkout and complete a test payment to reach the booking confirmation. To see a confirmed itinerary with seeded tickets, open [demo booking DEMO0500](http://127.0.0.1:8011/my/bookings/DEMO0500) as the demo traveler.
+
+For an existing local database, apply demo fixtures with `php artisan db:seed --class=DemoSeeder`. Re-running on the same date keeps existing bookings. Find the exact flights used by the sample round trip in booking `DEMO0500`.
+
+## Integrations and tests
+
+- Stripe checkout uses `STRIPE_KEY`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`. Use test credentials for the local demo. The webhook endpoint is `/stripe/webhook`.
+- Gemini powers the optional travel assistant. See the [assistant setup](docs/gemini-assistant.md).
+- Run the test suite with `php artisan test`, or run `php artisan test --filter=DemoSeederTest` to check the demo fixtures. The test configuration uses in-memory SQLite and requires `pdo_sqlite`.
 
 ## Useful routes
 
@@ -113,8 +93,14 @@ Open [http://localhost:8000](http://localhost:8000).
 - `/admin/airlines` — airline management
 - `/airline/login` — airline administrator sign-in
 
+## Project references
+
+- [Entity relationship diagram](https://dbdiagram.io/d/6ace73bde308025ea5e4d931)
+- [Local demo data reference](docs/demo-data.md)
+- [ERD PDF](assets/ERD.pdf)
+
 ## Repository and submission notes
 
 The repository's `.gitignore` excludes local dependencies, environment secrets, and generated assets, including `vendor/`, `node_modules/`, `.env`, and `public/build/`. Install dependencies and build assets using the commands above. Never submit a populated `.env` file or API keys.
 
-Trello Link [https://trello.com/b/GwcxKa78/yalla-%D9%86%D8%B7%D9%8A%D8%B1]
+[Project Trello board](https://trello.com/b/GwcxKa78/yalla-%D9%86%D8%B7%D9%8A%D8%B1)

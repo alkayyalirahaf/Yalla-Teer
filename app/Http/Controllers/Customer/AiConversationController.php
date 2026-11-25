@@ -49,7 +49,18 @@ class AiConversationController
 
         $flights = collect();
         if ($data['mode'] === 'find') {
-            $filters = $search->validateFilters($request->all());
+            $input = $request->all();
+            // Match the form when an older client submits conflicting controls.
+            foreach (['from' => 'origin_city_id', 'to' => 'destination_city_id'] as $airport => $city) {
+                if ($request->filled($airport)) {
+                    unset($input[$city]);
+                }
+            }
+            if (in_array($input['trip'] ?? null, ['one_way', 'one-way'], true)) {
+                unset($input['return']);
+            }
+
+            $filters = $search->validateFilters($input);
             $flights = $search->search($filters)->getCollection();
         } elseif ($data['mode'] === 'compare') {
             if (is_array($request->input('flights'))) {
