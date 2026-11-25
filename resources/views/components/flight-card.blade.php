@@ -7,7 +7,7 @@
             'from' => $flight->originAirport->code, 'to' => $flight->destinationAirport->code,
             'departure' => $flight->departure_at->format('Y-m-d H:i'),
             'arrival' => $flight->arrival_at->format('Y-m-d H:i'),
-            'duration' => (int) $flight->departure_at->diffInMinutes($flight->arrival_at).' minutes',
+            'duration' => __(':count minutes', ['count' => (int) $flight->departure_at->diffInMinutes($flight->arrival_at)]),
             'stops' => $flight->stops,
             'fares' => $flight->flightClasses->mapWithKeys(fn ($class) => [$class->class => [$class->price, $class->cabin_baggage_kg, $class->checked_baggage_kg]])->all(),
         ];
@@ -26,24 +26,24 @@
         </span>
         <div class="flight-timeline">
             <div class="flight-timeline__endpoint">
-                <span>Departure · <strong>{{ $flight['from'] }}</strong></span>
-                <time datetime="{{ $departure->format('Y-m-d\TH:i') }}"><strong>{{ $departure->format('H:i') }}</strong><span>{{ $departure->format('D, d M Y') }}</span></time>
+                <span>{{ __('Departure ·') }} <strong>{{ $flight['from'] }}</strong></span>
+                <time datetime="{{ $departure->format('Y-m-d\TH:i') }}"><strong>{{ $departure->format('H:i') }}</strong><span>{{ $departure->locale(app()->getLocale())->translatedFormat('D, d M Y') }}</span></time>
             </div>
             <div class="flight-timeline__duration">
                 <span>{{ $flight['duration'] }}</span>
                 <span>{{ trans_choice('{0} Nonstop|{1} :count stop|[2,*] :count stops', $flight['stops']) }}</span>
             </div>
             <div class="flight-timeline__endpoint">
-                <span>Arrival · <strong>{{ $flight['to'] }}</strong></span>
-                <time datetime="{{ $arrival->format('Y-m-d\TH:i') }}"><strong>{{ $arrival->format('H:i') }}</strong><span>{{ $arrival->format('D, d M Y') }}</span></time>
+                <span>{{ __('Arrival ·') }} <strong>{{ $flight['to'] }}</strong></span>
+                <time datetime="{{ $arrival->format('Y-m-d\TH:i') }}"><strong>{{ $arrival->format('H:i') }}</strong><span>{{ $arrival->locale(app()->getLocale())->translatedFormat('D, d M Y') }}</span></time>
             </div>
         </div>
         @if($showFare)
-            <p>{{ $flight['fares'] ? 'From JOD '.min(array_column($flight['fares'], 0)) : 'No available cabins' }}</p>
+            <p>{{ $flight['fares'] ? __('From JOD :amount', ['amount' => min(array_column($flight['fares'], 0))]) : __('No available cabins') }}</p>
         @endif
     </div>
     <div class="actions">
         {{ $slot }}
-        <a class="button secondary" href="{{ route('flights.show', array_filter(['flight' => $flight['id'], 'cabin' => $preferredCabin])) }}">Flight details</a>
+        <a class="button secondary" href="{{ route('flights.show', array_filter(['flight' => $flight['id'], 'cabin' => $preferredCabin])) }}">{{ __('Flight details') }}</a>
     </div>
 </article>

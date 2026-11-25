@@ -36,7 +36,7 @@ class AirlineController
 
         // Retrieve the latest airlines with pagination
         $airlines = $query->latest()
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.airlines.index', compact('airlines'));

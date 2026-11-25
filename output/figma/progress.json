@@ -1,0 +1,23 @@
+{
+  "fileUrl": "https://www.figma.com/design/KsxifZTZdIlB9TCA1xeisz",
+  "fileKey": "KsxifZTZdIlB9TCA1xeisz",
+  "sessionId": "50b24ac2-5f7b-4c64-8138-ee0fa4ea4395",
+  "promptId": "7899cb50-42cc-4df0-986a-f8a5705a30dd",
+  "sourceUrl": "http://127.0.0.1:8080/",
+  "isolatedPreviewUrl": "http://127.0.0.1:8139/",
+  "status": "Incomplete: Figma Starter MCP tool call limit reached",
+  "rebuiltScreens": {
+    "public": ["13:15", "13:550", "13:884", "13:1033", "13:1147", "13:1198", "13:1248", "13:1318", "13:1397", "13:1453", "13:1564", "13:1635", "13:1699", "13:1772", "13:1831"],
+    "airline": ["17:2", "17:243", "17:619", "17:782", "17:1160", "17:1421", "17:1639", "17:1810"],
+    "customerExtras": ["19:492", "19:766"],
+    "errors": ["20:492", "20:537", "20:582"]
+  },
+  "pendingCaptures": {
+    "admin": "ea6eaa81-e835-4c3f-b518-82c785018f64",
+    "management": "e0defdfd-e9fd-44d8-acb7-a267944fafc3",
+    "customer": "798ef1a2-83ae-472b-99bd-76a629bb59b7"
+  },
+  "temporaryReferencesToRemoveAfterValidation": ["1:2", "5:2", "7:2", "10:2", "15:2"],
+  "remaining": ["Poll pending captures", "Rebuild and validate customer and super admin screens", "Replace two 404 fixture screens with customerExtras", "Componentize remaining repeated controls", "Bind remaining source tokens", "Verify fonts and image nodes", "Organize Figma pages and remove capture references", "Stop isolated PHP preview server after pending uploads complete"],
+  "notes": ["Main public composition visually checked; editable text and content image nodes confirmed", "Public and airline output has 727 source color bindings and 13 shared components", "Sidebar variant mutation was rejected by the plan limit and did not succeed", "Preview database is isolated from application data", "Preview PHP router authenticates fictional demo identities only in the isolated local server"]
+}

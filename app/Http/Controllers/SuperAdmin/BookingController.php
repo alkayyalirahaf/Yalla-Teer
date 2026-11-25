@@ -8,7 +8,7 @@ class BookingController
 {
     public function index()
     {
-        $bookings = Booking::latest('id')->paginate(15);
+        $bookings = Booking::latest('id')->paginate(5);
 
         return view('booking.records', ['bookings' => $bookings, 'admin' => true]);
     }

@@ -19,7 +19,7 @@
         @endforeach
     </div>
     <div id="travel-panel-book" role="tabpanel" aria-labelledby="travel-tab-book" @if($active !== 'book') hidden @endif>
-        <x-landing-search />
+        <x-landing-search class="landing-search panel" />
     </div>
     <div id="travel-panel-manage" class="travel-tools-panel" role="tabpanel" aria-labelledby="travel-tab-manage" hidden>
         <p>{{ __('For the demo, use booking code YTDEMO and last name Traveler.') }}</p>

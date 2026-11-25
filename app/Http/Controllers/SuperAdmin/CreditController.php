@@ -18,12 +18,12 @@ class CreditController
         $customers = Customer::with('user')
             ->when($search !== '', fn ($query) => $query->whereHas('user', fn ($users) => $users
                 ->where(fn ($user) => $user->where('name', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%'))))
-            ->orderBy('id')->paginate(15, ['*'], 'customers_page')->withQueryString();
+            ->orderBy('id')->paginate(5, ['*'], 'customers_page')->withQueryString();
 
         $transactions = CreditTransaction::with('customer.user', 'booking')
             ->when($search !== '', fn ($query) => $query->whereHas('customer.user', fn ($users) => $users
                 ->where(fn ($user) => $user->where('name', 'like', '%'.$search.'%')->orWhere('email', 'like', '%'.$search.'%'))))
-            ->latest('id')->paginate(20, ['*'], 'history_page')->withQueryString();
+            ->latest('id')->paginate(5, ['*'], 'history_page')->withQueryString();
 
         return view('super-admin.panel', array_merge(compact('customers', 'transactions', 'search'), ['area' => 'admin', 'screen' => 'credits', 'title' => 'Customer credits']));
     }

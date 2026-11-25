@@ -27,7 +27,7 @@ class AirlineAdminController
             })
             ->when($filters['airline_id'] ?? null, fn ($query, $airlineId) => $query->where('airline_id', $airlineId))
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         $airlines = Airline::orderBy('name')->get(['id', 'name']);

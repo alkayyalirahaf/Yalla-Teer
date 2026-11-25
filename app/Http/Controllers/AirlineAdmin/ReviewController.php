@@ -15,7 +15,7 @@ class ReviewController
             ->whereHas('bookingFlight.flight', fn ($query) => $query->where('airline_id', $airlineId))
             ->with(['customer.user', 'bookingFlight.flight'])
             ->latest('reviews.created_at')
-            ->paginate(15);
+            ->paginate(5);
 
         return view('airline.reviews.index', compact('reviews'));
     }

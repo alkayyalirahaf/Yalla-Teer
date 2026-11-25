@@ -1,9 +1,9 @@
 @php
     $airports = \App\Models\Airport::with('city')->orderBy('code')->get()
-        ->mapWithKeys(fn ($airport) => [$airport->code => $airport->code.' · '.$airport->name.' ('.$airport->city->name.')'])->all();
+        ->mapWithKeys(fn ($airport) => [$airport->code => $airport->city->name.' · '.__($airport->city->name, [], 'ar').' · '.$airport->name.' · '.__($airport->name, [], 'ar')])->all();
     $selectedTrip = str_replace('_', '-', old('trip', request('trip', 'round-trip')));
 @endphp
-<form class="landing-search" method="GET" action="{{ route('flights.search') }}"
+<form {{ $attributes->merge(['class' => 'landing-search']) }} method="GET" action="{{ route('flights.search') }}"
     data-traveler-one="{{ __('1 traveler') }}" data-traveler-many="{{ __(':count travelers') }}"
     data-swap-error="{{ __('Choose a different arrival airport.') }}">
     <div class="landing-search-options">
@@ -19,10 +19,15 @@
         @endforeach
     </fieldset>
     </div>
+    <datalist id="route-airports">
+        @foreach($airports as $code => $airportLabel)
+            <option value="{{ $code }}">{{ $airportLabel }}</option>
+        @endforeach
+    </datalist>
     <fieldset class="landing-route-fields" data-single-trip>
-        <x-travel-field name="from" :label="__('From')" :value="request('from')" :options="['' => __('Departure airport')] + $airports" required />
+        <label class="field"><span>{{ __('From') }}</span><input name="from" list="route-airports" value="{{ old('from', request('from')) }}" placeholder="{{ __('Airport or city') }}" required></label>
         <button type="button" class="swap-airports" aria-label="{{ __('Swap departure and arrival airports') }}">⇄</button>
-        <x-travel-field name="to" :label="__('To')" :value="request('to')" :options="['' => __('Arrival airport')] + $airports" required />
+        <label class="field"><span>{{ __('To') }}</span><input name="to" list="route-airports" value="{{ old('to', request('to')) }}" placeholder="{{ __('Airport or city') }}" required></label>
         <x-travel-field name="depart" :label="__('Departure')" :value="request('depart')" type="date" required />
         <div class="return-date" @if($selectedTrip !== 'round-trip') hidden @endif><x-travel-field name="return" :label="__('Return')" :value="request('return')" type="date" :required="$selectedTrip === 'round-trip'" :disabled="$selectedTrip !== 'round-trip'" /></div>
     </fieldset>

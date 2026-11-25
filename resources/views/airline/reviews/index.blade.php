@@ -1,23 +1,23 @@
 @extends('airline-admin.flights.layout')
 
-@section('title', 'Airline Reviews')
+@section('title', __('Airline Reviews'))
 
 @section('flight-content')
 <div class="flight-card">
-    <div><h1>Reviews</h1><p>Customer feedback for your airline's flights.</p></div>
+    <div><h1>{{ __('Reviews') }}</h1><p>{{ __('Customer feedback for your airline\'s flights.') }}</p></div>
 </div>
 
 <section class="panel table-wrap section">
     <table>
-        <caption>Flight reviews</caption>
+        <caption>{{ __('Flight reviews') }}</caption>
         <thead>
             <tr>
-                <th scope="col">Flight</th>
-                <th scope="col">Customer</th>
-                <th scope="col">Rating</th>
-                <th scope="col">Comment</th>
-                <th scope="col">Status</th>
-                <th scope="col">Date</th>
+                <th scope="col">{{ __('Flight') }}</th>
+                <th scope="col">{{ __('Customer') }}</th>
+                <th scope="col">{{ __('Rating') }}</th>
+                <th scope="col">{{ __('Comment') }}</th>
+                <th scope="col">{{ __('Status') }}</th>
+                <th scope="col">{{ __('Date') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -33,15 +33,15 @@
                     <td>{{ $review->customer?->user?->name ?? '—' }}</td>
                     <td>{{ $review->rating }} / 5</td>
                     <td>{{ $review->comment ?: '—' }}</td>
-                    <td><span class="badge">{{ ucfirst($review->status) }}</span></td>
+                    <td><span class="badge">{{ __(ucfirst($review->status)) }}</span></td>
                     <td>{{ $review->created_at->format('Y-m-d') }}</td>
                 </tr>
             @empty
-                <tr><td colspan="6">No reviews found.</td></tr>
+                <tr><td colspan="6">{{ __('No reviews found.') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 </section>
 
-{{ $reviews->links() }}
+{{ $reviews->links('super-admin.pagination') }}
 @endsection

@@ -26,7 +26,7 @@ class ReviewModerationController
             })
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.reviews.index', compact('reviews', 'filters'));

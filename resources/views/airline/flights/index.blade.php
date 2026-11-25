@@ -1,46 +1,48 @@
 @extends('airline-admin.flights.layout')
 
-@section('title', 'Flights')
+@section('title', __('Flights'))
 
 @section('flight-content')
 <div class="flight-card">
-    <div><h1>Flights</h1><p>Manage your airline's schedule and seat inventory.</p></div>
-    <a class="button" href="{{ route('airline.create') }}">Create Flight</a>
+    <div><h1>{{ __('Flights') }}</h1><p>{{ __('Manage your airline\'s schedule and seat inventory.') }}</p></div>
+    <a class="button" href="{{ route('airline.create') }}">{{ __('Create Flight') }}</a>
 </div>
 
+<x-management-filters>
 <form method="GET" action="{{ route('airline.flights') }}" class="panel form-grid section">
     <label class="field">
-        <span>Flight number</span>
-        <input type="search" name="search" value="{{ request('search') }}" placeholder="Search flight number">
+        <span>{{ __('Flight number') }}</span>
+        <input aria-label="{{ __('Search flight number') }}" type="search" name="search" value="{{ request('search') }}" placeholder="{{ __('Search flight number') }}">
     </label>
     <label class="field">
-        <span>Status</span>
-        <select name="status">
-            <option value="">All statuses</option>
+        <span>{{ __('Status') }}</span>
+        <select aria-label="{{ __('Status') }}" name="status">
+            <option value="">{{ __('All statuses') }}</option>
             @foreach(['scheduled', 'delayed', 'cancelled', 'completed'] as $status)
-                <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                <option value="{{ $status }}" @selected(request('status') === $status)>{{ __(ucfirst($status)) }}</option>
             @endforeach
         </select>
     </label>
     <div class="actions">
-        <button class="button" type="submit">Filter</button>
-        <a class="button secondary" href="{{ route('airline.flights') }}">Clear</a>
+        <button class="button" type="submit">{{ __('Filter') }}</button>
+        <a class="button secondary" href="{{ route('airline.flights') }}">{{ __('Clear') }}</a>
     </div>
 </form>
+</x-management-filters>
 
 <section class="panel table-wrap section">
     <table>
-        <caption>Flight schedule</caption>
+        <caption>{{ __('Flight schedule') }}</caption>
         <thead>
             <tr>
-                <th scope="col">Flight</th>
-                <th scope="col">Route</th>
-                <th scope="col">Departure</th>
-                <th scope="col">Arrival</th>
-                <th scope="col">Stops</th>
-                <th scope="col">Seats</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
+                <th scope="col">{{ __('Flight') }}</th>
+                <th scope="col">{{ __('Route') }}</th>
+                <th scope="col">{{ __('Departure') }}</th>
+                <th scope="col">{{ __('Arrival') }}</th>
+                <th scope="col">{{ __('Stops') }}</th>
+                <th scope="col">{{ __('Seats') }}</th>
+                <th scope="col">{{ __('Status') }}</th>
+                <th scope="col">{{ __('Actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -52,25 +54,25 @@
                     <td>{{ $flight->arrival_at->format('Y-m-d H:i') }}</td>
                     <td>{{ $flight->stops }}</td>
                     <td>{{ $flight->flightClasses->sum('total_seats') }}</td>
-                    <td><span class="badge">{{ ucfirst($flight->status) }}</span></td>
+                    <td><span class="badge">{{ __(ucfirst($flight->status)) }}</span></td>
                     <td>
                         <div class="actions">
-                            <a class="button secondary" href="{{ route('airline.flight', $flight) }}">View</a>
-                            <a class="button secondary" href="{{ route('airline.edit', $flight) }}">Edit</a>
+                            <a class="button secondary" href="{{ route('airline.flight', $flight) }}">{{ __('View') }}</a>
+                            <a class="button secondary" href="{{ route('airline.edit', $flight) }}">{{ __('Edit') }}</a>
                             <form method="POST" action="{{ route('airline.destroy', $flight) }}" onsubmit="return confirm('Delete this flight?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="quiet" type="submit">Delete</button>
+                                <button class="button danger" type="submit">{{ __('Delete') }}</button>
                             </form>
                         </div>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8">No flights found.</td></tr>
+                <tr><td colspan="8">{{ __('No flights found.') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 </section>
 
-{{ $flights->links() }}
+{{ $flights->links('super-admin.pagination') }}
 @endsection

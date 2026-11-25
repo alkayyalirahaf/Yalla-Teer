@@ -1,21 +1,19 @@
 .assistant-shortcut {
     position: fixed;
-    inset-inline-end: 1rem;
-    inset-block-end: max(1rem, env(safe-area-inset-bottom));
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
     z-index: 20;
     display: block;
-    inline-size: clamp(5.5rem, 11vw, 8rem);
+    width: clamp(3.5rem, 6vw, 5rem);
     line-height: 0;
+    border-radius: 50%;
 }
-.landing .assistant-shortcut { inline-size: clamp(9rem, 17vw, 14rem); }
-.assistant-shortcut img { width: 100%; height: auto; filter: drop-shadow(0 4px 8px #000c); }
-.assistant-shortcut:focus-visible { outline: 2px solid #ffe1a6; outline-offset: 3px; border-radius: .5rem; }
+.assistant-shortcut img { width: 100%; height: auto; }
+.assistant-shortcut:focus-visible { outline: 2px solid var(--ui-link); outline-offset: 3px; }
 @media (prefers-reduced-motion: no-preference) {
-    .assistant-shortcut img { animation: assistant-jet-float 3.6s ease-in-out infinite; }
-    .assistant-shortcut:is(:hover, :focus-visible) img { animation-play-state: paused; }
-}
-@keyframes assistant-jet-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-7px); }
+    .assistant-shortcut { transition: transform .16s ease; }
+    .assistant-shortcut:hover { transform: translateY(-2px); }
+    .assistant-shortcut:active { transform: scale(.96); }
 }
 @media print { .assistant-shortcut { display: none; } }
+

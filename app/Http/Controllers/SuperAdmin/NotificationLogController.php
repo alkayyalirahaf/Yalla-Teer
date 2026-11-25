@@ -18,7 +18,7 @@ class NotificationLogController
         $logs = NotificationLog::with('booking.customer.user')
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->input('status')))
             ->latest()
-            ->paginate(20)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.notifications.index', compact('logs'));

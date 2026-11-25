@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Airport;
 use App\Models\Flight;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
@@ -12,9 +13,27 @@ class FlightSearchService
 {
     public function validateFilters(array $input): array
     {
-        foreach (['from', 'to'] as $field) {
+        $airports = null;
+        foreach (['from' => 'origin_city_id', 'to' => 'destination_city_id'] as $field => $cityField) {
             if (isset($input[$field]) && is_string($input[$field])) {
-                $input[$field] = strtoupper(trim($input[$field]));
+                $term = trim($input[$field]);
+                $input[$field] = strtoupper($term);
+                if ($term === '' || preg_match('/^[a-z]{3}$/i', $term) || mb_strlen($term) > 160) {
+                    continue;
+                }
+                $airports ??= Airport::with('city')->get();
+                $key = $this->placeKey($term);
+                $matches = $airports->filter(fn ($airport) => $this->matchesPlace($airport->name, $key));
+                if ($matches->count() === 1) {
+                    $input[$field] = $matches->first()->code;
+                } elseif (empty($input[$cityField])) {
+                    $cities = $airports->pluck('city')->filter()->unique('id')
+                        ->filter(fn ($city) => $this->matchesPlace($city->name, $key));
+                    if ($cities->count() === 1) {
+                        $input[$cityField] = $cities->first()->id;
+                        unset($input[$field]);
+                    }
+                }
             }
         }
 
@@ -81,6 +100,18 @@ class FlightSearchService
         return array_merge($filters, $travelers);
     }
 
+    private function placeKey(string $value): string
+    {
+        return mb_strtolower(strtr(preg_replace('/[\x{064B}-\x{065F}\x{0670}ـ]/u', '', trim($value)), [
+            'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ى' => 'ي',
+        ]));
+    }
+
+    private function matchesPlace(string $name, string $key): bool
+    {
+        return $this->placeKey($name) === $key || $this->placeKey(__($name, [], 'ar')) === $key;
+    }
+
     public function search(array $filters)
     {
         $filters = $this->validateFilters($filters);
@@ -89,7 +120,7 @@ class FlightSearchService
         $direction = str_ends_with($sort, 'desc') ? 'desc' : 'asc';
 
         return $this->query($filters)->orderBy($column, $direction)->orderBy('id')
-            ->paginate(12, ['*'], $filters['leg'] === 'return' ? 'return_page' : 'outbound_page')
+            ->paginate(5, ['*'], $filters['leg'] === 'return' ? 'return_page' : 'outbound_page')
             ->withQueryString();
     }
 

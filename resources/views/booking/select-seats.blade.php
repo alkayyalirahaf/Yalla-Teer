@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Select seats')
+@section('title', __('Select seats'))
 @section('content')
 <div class="stack seat-selection">
     <header>
-        <a class="selection-back" href="{{ route('book.passengers') }}">← Back to travelers</a>
-        <h1 class="flight-page-title">Select seats</h1>
-        <p>Choose one seat for each traveler. Your seats are held for 15 minutes after you continue.</p>
+        <a class="selection-back" href="{{ route('book.passengers') }}">{{ __('← Back to travelers') }}</a>
+        <h1 class="flight-page-title">{{ __('Select seats') }}</h1>
+        <p>{{ __('Choose one seat for each traveler. Your seats are held for 15 minutes after you continue.') }}</p>
     </header>
     <form class="stack" method="POST" action="{{ route('book.seats.store') }}">
         @csrf
@@ -14,10 +14,10 @@
             <section class="panel stack seat-flight" data-seat-picker>
                 <div class="seat-flight-heading">
                     <div>
-                        <p>{{ ucfirst($direction) }}</p>
+                        <p>{{ __(ucfirst($direction)) }}</p>
                         <h2>{{ $cabin->flight->flight_number }}</h2>
                     </div>
-                    <span class="seat-flight-cabin">{{ ucfirst($cabin->class) }}</span>
+                    <span class="seat-flight-cabin">{{ __(ucfirst($cabin->class)) }}</span>
                 </div>
                 <div class="actions seat-traveler-switch" data-seat-traveler-switch hidden>
                     @foreach($passengers as $index => $passenger)
@@ -41,7 +41,7 @@
             </section>
         @endforeach
         <div class="actions seat-selection-actions">
-            <button class="button" type="submit">Review booking</button>
+            <button class="button" type="submit">{{ __('Review booking') }}</button>
         </div>
     </form>
 </div>

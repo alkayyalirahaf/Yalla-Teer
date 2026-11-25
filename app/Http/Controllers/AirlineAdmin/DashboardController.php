@@ -62,21 +62,18 @@ class DashboardController
                 'flightClasses.seats' => fn ($query) => $query->where('status', 'available'),
             ])
             ->orderBy('departure_at')
-            ->limit(5)
-            ->get();
+            ->paginate(5, ['*'], 'upcoming_page')->fragment('upcoming-flights');
 
         $recentBookings = (clone $airlineBookings)
             ->with(['customer.user'])
             ->latest('bookings.created_at')
-            ->limit(5)
-            ->get();
+            ->paginate(5, ['*'], 'bookings_page')->fragment('recent-bookings');
 
         $recentReviews = Review::query()
             ->whereHas('bookingFlight.flight', fn ($query) => $query->where('airline_id', $airlineId))
             ->with(['customer.user', 'bookingFlight.flight'])
             ->latest('reviews.created_at')
-            ->limit(5)
-            ->get();
+            ->paginate(5, ['*'], 'reviews_page')->fragment('recent-reviews');
 
         return view('airline.dashboard', compact(
             'totalFlights',

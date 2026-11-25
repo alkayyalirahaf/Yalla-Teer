@@ -30,7 +30,7 @@ class BookingController
             ->when($filters['search'] ?? null, fn ($query, $search) => $query->where('code', 'like', '%'.$search.'%'))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->latest('bookings.created_at')
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('airline.bookings.index', compact('bookings', 'filters'));
