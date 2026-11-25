@@ -30,6 +30,6 @@ class DashboardController
 
         $statistics = array_map(fn ($query) => $query->count(), $queries);
 
-        return view('super-admin.panel', array_merge(compact('statistics', 'recentBookings', 'recentPayments'), ['area' => 'admin', 'screen' => 'dashboard', 'title' => 'Super Admin Dashboard']));
+        return view('super-admin.panel', array_merge(compact('statistics', 'recentBookings', 'recentPayments'), ['area' => 'admin', 'screen' => 'dashboard', 'title' => 'Platform Admin Dashboard']));
     }
 }

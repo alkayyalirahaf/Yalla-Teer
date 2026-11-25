@@ -1,5 +1,5 @@
     <p class="eyebrow mb-2">{{ __('Platform overview') }}</p>
-    <h1>{{ __('Super Admin Dashboard') }}</h1>
+    <h1>{{ __('Platform Admin Dashboard') }}</h1>
     <div class="row g-3 mb-4">
         @foreach($statistics as $label => $count)
             <div class="col-6 col-xl-4"><article class="card card-body admin-stat-card h-100"><h2 class="h6">{{ __($label) }}</h2><p class="fs-3 mb-0">{{ number_format($count) }}</p></article></div>

@@ -290,7 +290,7 @@ class Dev5ControllerRoutesTest extends TestCase
     private function makeSuperAdmin(): User
     {
         $user = User::create([
-            'name' => 'Super Admin',
+            'name' => 'Platform Admin',
             'email' => 'admin@example.test',
             'password' => 'password',
         ]);

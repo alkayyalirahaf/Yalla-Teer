@@ -38,7 +38,7 @@ class AuthFlowTest extends TestCase
     {
         config()->set('auth_seeds', [
             'customer' => ['name' => 'Seed Customer', 'email' => 'seed-customer@example.test', 'password' => 'SeedCustomer123!'],
-            'super_admin' => ['name' => 'Seed Super Admin', 'email' => 'seed-admin@example.test', 'password' => 'SeedAdmin123!'],
+            'super_admin' => ['name' => 'Seed Platform Admin', 'email' => 'seed-admin@example.test', 'password' => 'SeedAdmin123!'],
             'airline_admin' => ['name' => 'Seed Airline Admin', 'email' => 'seed-airline-admin@example.test', 'password' => 'SeedAirline123!'],
             'airline' => ['name' => 'Seed Airline', 'code' => 'SDR', 'country' => 'Jordan'],
         ]);

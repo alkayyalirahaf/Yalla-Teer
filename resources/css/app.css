@@ -396,7 +396,7 @@ summary { cursor: pointer; }
 .booking-cabin {max-width:100%;margin-inline:auto;overflow-x:auto}
 .booking-cabin table {min-width:0;width:auto;margin-inline:auto;border-collapse:separate;border-spacing:0}
 
-/* Super Admin workspace */
+/* Platform Admin workspace */
 .super-admin-body .site-header, .super-admin-body .site-footer { display: none; }
 .super-admin-body > main.wrap { width: 100%; max-width: none; padding: 0; margin: 0; flex: 1; }
 .admin-frame { --admin-bg: var(--ui-bg); --admin-panel: var(--ui-surface); --admin-border: var(--ui-border); --admin-gold: var(--ui-link); min-height: 100vh; display: flex; background: var(--admin-bg); color: var(--ui-text); }

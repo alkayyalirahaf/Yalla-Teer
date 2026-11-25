@@ -8,7 +8,7 @@ The homepage pairs the booking tools with the travel hero on wide screens and st
 
 The assistant keeps its original conversation and navigation handlers. Its desktop layout places history beside the conversation. The floating jet uses the original PNG at its natural aspect ratio, with keyboard focus, reduced-motion support and position adjustments near other controls. The only attachment supplied was the written brief. The identity of the existing jet as the intended replacement image could not be confirmed.
 
-The staff sidebars now use the existing outline SVG component for dashboards, flights, airports, countries, customer accounts, bookings, payments, reviews, notifications, messages, conversations and the mobile menu. The Super Admin dashboard groups recent booking and payment ledgers side by side when space permits. Management search forms share a collapsible filter container, show an active count and preserve the existing form actions. Staff actions, destructive controls and account links use shared button styles.
+The staff sidebars now use the existing outline SVG component for dashboards, flights, airports, countries, customer accounts, bookings, payments, reviews, notifications, messages, conversations and the mobile menu. The Platform Admin dashboard groups recent booking and payment ledgers side by side when space permits. Management search forms share a collapsible filter container, show an active count and preserve the existing form actions. Staff actions, destructive controls and account links use shared button styles.
 
 ## Design tokens
 

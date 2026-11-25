@@ -86,7 +86,7 @@ class OmarMergeReviewTest extends TestCase
     public function test_admin_login_form_renders_at_its_existing_route(): void
     {
         $this->get(route('admin.login'))->assertOk()->assertViewIs('auth.login')
-            ->assertSee('Super Admin Login')
+            ->assertSee('Platform Admin Login')
             ->assertSee('action="'.route('admin.login.submit').'"', false)
             ->assertSee('name="_token"', false);
     }

@@ -12,6 +12,7 @@
             ['Create flight', 'airline.create', 'Create flight', ['airline.create']],
             ['Bookings', 'airline.bookings', 'ticket', ['airline.bookings', 'airline.booking']],
             ['Reviews', 'airline.reviews', 'Reviews', ['airline.reviews']],
+            ['Settings', 'airline.settings', 'Settings', ['airline.settings']],
         ];
     @endphp
     <div class="admin-frame">
