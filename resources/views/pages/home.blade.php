@@ -17,6 +17,7 @@
     <div class="cards">
         <a class="panel tile" href="{{ route('flights.search') }}"><h3>{{ __('Find a flight') }}</h3><p>{{ __('Browse upcoming routes and compare schedules.') }}</p></a>
         <a class="panel tile" href="{{ route('destinations') }}"><h3>{{ __('Destination guide') }}</h3><p>{{ __('Look up local languages, currencies, and travel tips.') }}</p></a>
+        <a class="panel tile" href="{{ route('airlines.index') }}"><h3>{{ __('Airlines') }}</h3><p>{{ __('See available airlines, ratings, and customer comments.') }}</p></a>
         <a class="panel tile" href="{{ route('booking.lookup') }}"><h3>{{ __('Find your booking') }}</h3><p>{{ __('Use your booking code and last name.') }}</p></a>
     </div>
 </section>

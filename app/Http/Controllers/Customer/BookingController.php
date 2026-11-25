@@ -38,7 +38,7 @@ class BookingController
         DB::transaction(function () use ($request, $code): void {
             $booking = $request->user()->customer->bookings()->where('code', $code)->lockForUpdate()->firstOrFail();
             abort_unless($booking->status === 'pending'
-                && !$booking->payments()->where('status', 'succeeded')->exists(), 409, 'Contact support to change a paid booking.');
+                && ! $booking->payments()->where('status', 'succeeded')->exists(), 409, 'Contact support to change a paid booking.');
 
             $hold = Cache::store('database')->get(BookingFinalizationService::holdKey($booking));
             if ($hold) {
@@ -66,7 +66,8 @@ class BookingController
     private function details(Booking $booking, string $title)
     {
         $booking->load(['bookingFlights.flight.originAirport', 'bookingFlights.flight.destinationAirport',
-            'bookingFlights.flightClass', 'bookingFlights.tickets.seat', 'bookingFlights.tickets.passenger', 'passengers']);
+            'bookingFlights.flight.airline', 'bookingFlights.flightClass', 'bookingFlights.tickets.seat',
+            'bookingFlights.tickets.passenger', 'bookingFlights.reviews', 'passengers']);
         $hold = Cache::store('database')->get(BookingFinalizationService::holdKey($booking));
         $paid = $booking->payments()->where('status', 'succeeded')->exists();
         $heldSeats = $hold ? Seat::whereKey(collect($hold['seats'])->flatten()->all())->pluck('seat_number', 'id') : collect();

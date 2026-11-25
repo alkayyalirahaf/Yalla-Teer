@@ -151,22 +151,33 @@ class Dev3FlowTest extends TestCase
         $this->assertModelMissing($empty);
     }
 
-    public function test_review_ownership_completion_and_duplicate_protection_over_http(): void
+    public function test_review_ownership_payment_and_duplicate_protection_over_http(): void
     {
         [$class] = $this->inventory();
         $owner = User::factory()->create();
         $customer = $owner->customer()->create(['credit_balance' => '0.00']);
-        $booking = $customer->bookings()->create(['code' => 'TESTREVIEW', 'trip_type' => 'one_way', 'status' => 'completed',
+        $booking = $customer->bookings()->create(['code' => 'TESTREVIEW', 'trip_type' => 'one_way', 'status' => 'confirmed',
             'subtotal' => 100, 'taxes' => 0, 'fees' => 0, 'total' => 100, 'credits_used' => 0, 'amount_paid' => 100,
             'contact_email' => $owner->email]);
         $segment = $booking->bookingFlights()->create(['flight_id' => $class->flight_id, 'flight_class_id' => $class->id, 'direction' => 'outbound']);
+
         $this->actingAs($owner)->get(route('my.reviews.create', $segment))->assertSessionHasErrors('review');
-        $class->flight->update(['status' => 'completed', 'departure_at' => now()->subHours(3), 'arrival_at' => now()->subHour()]);
+
+        $booking->payments()->create([
+            'stripe_payment_intent_id' => 'pi_test_review',
+            'amount' => 100,
+            'status' => 'succeeded',
+            'receipt_number' => 'RCP-TEST-1',
+            'paid_at' => now(),
+        ]);
+
         $this->get(route('my.reviews.create', $segment))->assertOk()->assertViewIs('customer.account')->assertDontSee('Sample account.')->assertDontSee('Preview review');
         $this->get(route('my.review', $booking->code))->assertRedirect(route('my.reviews.create', $segment->id));
+
         $other = User::factory()->create();
         $other->customer()->create(['credit_balance' => '0.00']);
         $this->actingAs($other)->get(route('my.reviews.create', $segment))->assertNotFound();
+
         $this->actingAs($owner)->post(route('my.reviews.store', $segment), ['rating' => 5, 'comment' => 'Good flight'])
             ->assertRedirect(route('my.bookings'));
         $this->post(route('my.reviews.store', $segment), ['rating' => 4, 'comment' => 'Duplicate'])->assertSessionHasErrors('review');

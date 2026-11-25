@@ -284,20 +284,18 @@ class OmarDiscoveryTest extends TestCase
         }
     }
 
-    public function test_incomplete_booking_or_flight_is_not_reviewable(): void
+    public function test_unpaid_booking_is_not_reviewable(): void
     {
         $method = new \ReflectionMethod(ReviewController::class, 'checkEligibility');
-        foreach ([['confirmed', 'completed', '-1 day'], ['completed', 'scheduled', '-1 day'], ['completed', 'completed', '+1 day']] as [$bookingStatus, $flightStatus, $arrival]) {
-            $segment = new BookingFlight;
-            $segment->setRelation('booking', new Booking(['status' => $bookingStatus]));
-            $segment->setRelation('flight', new Flight(['status' => $flightStatus, 'arrival_at' => now()->modify($arrival)]));
-            try {
-                $method->invoke(new ReviewController, $segment);
-                $this->fail('Incomplete travel was accepted for review.');
-            } catch (ValidationException $exception) {
-                $this->assertArrayHasKey('review', $exception->errors());
-            }
-        }
+        $segment = new BookingFlight;
+        $booking = new Booking(['status' => 'pending']);
+        $booking->setRelation('payments', collect([(object) ['status' => 'pending']]));
+        $segment->setRelation('booking', $booking);
+        $segment->setRelation('flight', new Flight(['status' => 'scheduled', 'arrival_at' => now()->addDay()]));
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Reviews are available after your booking is paid.');
+        $method->invoke(new ReviewController, $segment);
     }
 
     public function test_ai_is_unavailable_without_provider_configuration(): void
@@ -313,11 +311,13 @@ class OmarDiscoveryTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public function test_duplicate_review_is_rejected_even_after_travel_is_completed(): void
+    public function test_duplicate_review_is_rejected_for_paid_booking(): void
     {
         $segment = Mockery::mock(BookingFlight::class)->makePartial();
-        $segment->setRelation('booking', new Booking(['customer_id' => 42, 'status' => 'completed']));
-        $segment->setRelation('flight', new Flight(['status' => 'completed', 'arrival_at' => now()->subDay()]));
+        $booking = new Booking(['customer_id' => 42, 'status' => 'confirmed']);
+        $booking->setRelation('payments', collect([(object) ['status' => 'succeeded']]));
+        $segment->setRelation('booking', $booking);
+        $segment->setRelation('flight', new Flight(['status' => 'scheduled', 'arrival_at' => now()->addDay()]));
         $reviews = Mockery::mock(HasMany::class);
         $reviews->shouldReceive('where')->once()->with('customer_id', 42)->andReturnSelf();
         $reviews->shouldReceive('exists')->once()->andReturn(true);

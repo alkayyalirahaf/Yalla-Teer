@@ -52,6 +52,20 @@
                         @endif
                     </div>
                 @endforeach
+                @if(!($admin ?? false) && $paid)
+                    @php
+                        $customerId = auth()->user()?->customer?->id;
+                        $customerReview = $customerId ? $leg->reviews->firstWhere('customer_id', $customerId) : null;
+                    @endphp
+                    <div class="booking-ticket-row">
+                        @if($customerReview)
+                            <p><strong>{{ __('Your review') }}</strong> <span>{{ $customerReview->rating }}/5 - {{ __(ucfirst($customerReview->status)) }}</span></p>
+                        @else
+                            <p><strong>{{ __('Flight review') }}</strong> <span>{{ __('Rate this flight after payment.') }}</span></p>
+                            <a class="button secondary" href="{{ route('my.reviews.create', $leg) }}">{{ __('Write a review') }}</a>
+                        @endif
+                    </div>
+                @endif
             </div>
         @endforeach
     </section>
