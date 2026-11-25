@@ -180,18 +180,43 @@ class DemoSeeder extends Seeder
 
     private function bookings(array $customers, array $flights): void
     {
-        foreach (['confirmed', 'completed', 'cancelled', 'pending'] as $index => $status) {
-            foreach ($customers as $customerIndex => $customer) {
+        $scenarios = [
+            ['confirmed', 7],
+            ['completed', -7],
+            ['cancelled', 7],
+            ['pending', 7],
+            ['confirmed', 1],
+            ['confirmed', 1, 'dubai_round_trip'],
+        ];
+
+        foreach ($scenarios as $index => $scenario) {
+            [$status, $day] = $scenario;
+            $dubaiRoundTrip = ($scenario[2] ?? null) === 'dubai_round_trip';
+            $scenarioCustomers = $dubaiRoundTrip ? array_slice($customers, 0, 1) : $customers;
+            foreach ($scenarioCustomers as $customerIndex => $customer) {
                 $code = 'DEMO'.sprintf('%02d%02d', $index, $customerIndex);
                 if (Booking::where('code', $code)->exists()) {
                     continue;
                 }
-                $round = $customerIndex === 1;
-                $legs = $flights[$status === 'completed' ? -7 : 7][$customerIndex][$index % 3];
+                $round = $customerIndex === 1 || $dubaiRoundTrip;
+                $carrier = $day === 1 ? $customerIndex % 3 : $index % 3;
+                $legs = $flights[$day][$customerIndex][$carrier];
+                if ($dubaiRoundTrip) {
+                    $legs['return'] = Flight::where('airline_id', $legs['outbound']->airline_id)
+                        ->where('flight_number', $legs['return']->flight_number)
+                        ->where('origin_airport_id', $legs['outbound']->destination_airport_id)
+                        ->where('destination_airport_id', $legs['outbound']->origin_airport_id)
+                        ->where('departure_at', '>=', today()->addDays(3))
+                        ->where('departure_at', '<=', $legs['return']->departure_at)
+                        ->where('status', 'scheduled')
+                        ->whereHas('flightClasses', fn ($query) => $query->where('class', 'economy'))
+                        ->orderBy('departure_at')
+                        ->firstOrFail();
+                }
                 if (! $round) {
                     unset($legs['return']);
                 }
-                $count = $round ? 3 : 1;
+                $count = $round ? 3 : ($day === 1 ? 2 : 1);
                 $classes = collect($legs)->map(fn ($flight) => $flight->flightClasses()->where('class', $customerIndex === 2 ? 'business' : 'economy')->firstOrFail());
                 $total = $classes->sum('price') * $count;
                 $paid = in_array($status, ['confirmed', 'completed'], true);

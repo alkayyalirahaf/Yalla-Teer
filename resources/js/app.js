@@ -6,14 +6,30 @@ document.querySelectorAll('[data-dismiss-toast]').forEach((button) => {
 
 document.querySelectorAll('[data-assistant-composer]').forEach((form) => {
     const options = form.querySelectorAll('[data-assistant-options]');
+    const trip = form.elements.namedItem('trip');
+    const returnDate = form.elements.namedItem('return');
+
     const update = () => {
         for (const section of options) {
             const active = section.dataset.assistantOptions === form.elements.mode.value;
             section.hidden = !active;
             section.open = active;
+            section.querySelectorAll('input, select').forEach((field) => {
+                field.disabled = !active || (field === returnDate && trip.value !== 'round_trip');
+            });
         }
     };
 
+    for (const [airportName, cityName] of [['from', 'origin_city_id'], ['to', 'destination_city_id']]) {
+        const airport = form.elements.namedItem(airportName);
+        const city = form.elements.namedItem(cityName);
+        airport.addEventListener('change', () => { if (airport.value) city.value = ''; });
+        city.addEventListener('change', () => { if (city.value) airport.value = ''; });
+        // Old input from a rejected request may already contain both values.
+        if (airport.value && city.value) city.value = '';
+    }
+
+    trip.addEventListener('change', update);
     form.querySelectorAll('[name="mode"]').forEach((input) => input.addEventListener('change', update));
     update();
 });

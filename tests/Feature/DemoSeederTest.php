@@ -32,7 +32,12 @@ class DemoSeederTest extends TestCase
             $this->assertGreaterThan(0, $counts[$table], $table);
         }
         $this->assertSame(468, Flight::count());
-        $this->assertSame(16, Booking::count());
+        $this->assertSame(21, Booking::count());
+        $dubaiEconomy = Flight::where('flight_number', 'RJD000O')
+            ->whereDate('departure_at', today()->addDay()->toDateString())
+            ->firstOrFail()->flightClasses()->where('class', 'economy')->firstOrFail();
+        $this->assertSame(['1A', '1B', '1C', '1D', '1E'], $dubaiEconomy->seats()->where('status', 'booked')->orderBy('seat_number')->pluck('seat_number')->all());
+        $this->assertSame(55, $dubaiEconomy->seats()->where('status', 'available')->count());
         $user = User::where('email', 'traveler@demo.example.test')->firstOrFail();
         $this->assertTrue(Hash::check(DemoSeeder::PASSWORD, $user->password));
         $user->update(['name' => 'Edited traveler']);

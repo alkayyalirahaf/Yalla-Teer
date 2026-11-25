@@ -6,6 +6,7 @@ use App\Models\AiConversation;
 use App\Models\User;
 use App\Services\AiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -48,6 +49,32 @@ class GeminiAssistantTest extends TestCase
         $other = User::factory()->createOne();
         $other->customer()->create(['credit_balance' => 0]);
         $this->actingAs($other)->get(route('my.assistant.show', $conversation))->assertNotFound();
+    }
+
+    public function test_assistant_find_ignores_conflicting_fields_from_an_older_form(): void
+    {
+        $user = User::factory()->createOne();
+        $user->customer()->create(['credit_balance' => 0]);
+        $country = DB::table('countries')->insertGetId([
+            'name' => 'Jordan', 'code' => 'JO', 'currency' => 'JOD', 'language' => 'Arabic',
+        ]);
+        $origin = DB::table('cities')->insertGetId(['name' => 'Amman', 'country_id' => $country]);
+        $destination = DB::table('cities')->insertGetId(['name' => 'Aqaba', 'country_id' => $country]);
+        DB::table('airports')->insert([
+            ['city_id' => $origin, 'code' => 'AMM', 'name' => 'Amman'],
+            ['city_id' => $destination, 'code' => 'AQJ', 'name' => 'Aqaba'],
+        ]);
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::response($this->response(['Try another date.']))]);
+
+        $this->actingAs($user)->post('/my/assistant', [
+            'mode' => 'find', 'message' => 'Find a flight', 'trip' => 'one_way',
+            'from' => 'AMM', 'origin_city_id' => $origin,
+            'to' => 'AQJ', 'destination_city_id' => $destination,
+            'depart' => now('Asia/Amman')->addDay()->toDateString(),
+            'return' => now('Asia/Amman')->addDays(2)->toDateString(),
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        Http::assertSentCount(1);
     }
 
     public function test_gemini_receives_only_explicit_database_flight_context(): void
