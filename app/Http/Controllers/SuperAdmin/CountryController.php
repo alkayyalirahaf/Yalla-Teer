@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Models\Country;
-use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +31,7 @@ class CountryController
         $this->authorizeAdmin($request);
         Country::create($this->validatedData($request));
 
-        return redirect()->route('admin.countries')->with('status', 'Country created.');
+        return redirect()->route('admin.countries')->with('status', 'Destination created.');
     }
 
     public function edit(Request $request, Country $country)
@@ -46,7 +46,7 @@ class CountryController
         $this->authorizeAdmin($request);
         $country->update($this->validatedData($request, $country));
 
-        return redirect()->route('admin.countries')->with('status', 'Country updated.');
+        return redirect()->route('admin.countries')->with('status', 'Destination updated.');
     }
 
     public function destroy(Request $request, Country $country)
@@ -66,19 +66,19 @@ class CountryController
                 return true;
             });
         } catch (QueryException $exception) {
-            if (!in_array((int) ($exception->errorInfo[1] ?? 0), [1451, 547, 787], true)) {
+            if (! in_array((int) ($exception->errorInfo[1] ?? 0), [1451, 547, 787], true)) {
                 throw $exception;
             }
 
             $deleted = false;
         }
 
-        if (!$deleted) {
+        if (! $deleted) {
             return redirect()->route('admin.countries')
-                ->withErrors(['country' => 'This country has cities and cannot be deleted.']);
+                ->withErrors(['country' => 'This destination has cities and cannot be deleted.']);
         }
 
-        return redirect()->route('admin.countries')->with('status', 'Country deleted.');
+        return redirect()->route('admin.countries')->with('status', 'Destination deleted.');
     }
 
     private function authorizeAdmin(Request $request): void

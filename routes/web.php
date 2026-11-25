@@ -1,68 +1,59 @@
 <?php
 
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AirlineAdmin\BookingController as AirlineBookingController;
+use App\Http\Controllers\AirlineAdmin\DashboardController as AirlineDashboardController;
+use App\Http\Controllers\AirlineAdmin\FlightController as AirlineFlightController;
+use App\Http\Controllers\AirlineAdmin\ReviewController as AirlineReviewController;
+use App\Http\Controllers\AirlineAdmin\SettingsController as AirlineSettingsController;
 use App\Http\Controllers\Auth\AirlineAdminSessionController;
 use App\Http\Controllers\Auth\CustomerSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Customer\AiConversationController;
-use App\Http\Controllers\Customer\BookingFlowController;
 use App\Http\Controllers\Customer\BookingController as CustomerBookingController;
+use App\Http\Controllers\Customer\BookingFlowController;
 use App\Http\Controllers\Customer\BookingLookupController;
-use App\Http\Controllers\Customer\SeatSelectionController;
-use App\Http\Controllers\Customer\TicketController;
-use App\Http\Controllers\Customer\TravelerProfileController;
-use App\Http\Controllers\SuperAdmin\BookingController as SuperAdminBookingController;
 use App\Http\Controllers\Customer\CreditWalletController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\ReviewController;
+use App\Http\Controllers\Customer\SeatSelectionController;
+use App\Http\Controllers\Customer\TicketController;
+use App\Http\Controllers\Customer\TravelerProfileController;
+use App\Http\Controllers\PublicFlightController;
 use App\Http\Controllers\PublicSite\CompareController;
 use App\Http\Controllers\PublicSite\ContactMessageController;
+use App\Http\Controllers\PublicSite\DestinationController;
 use App\Http\Controllers\PublicSite\HomeController;
 use App\Http\Controllers\PublicSite\InformationController;
-use App\Http\Controllers\PublicFlightController;
+use App\Http\Controllers\SuperAdmin\AiConversationController as AdminAiConversationController;
+use App\Http\Controllers\SuperAdmin\AirlineAdminController;
+use App\Http\Controllers\SuperAdmin\AirlineController;
 use App\Http\Controllers\SuperAdmin\AirportController;
+use App\Http\Controllers\SuperAdmin\BookingController as SuperAdminBookingController;
 use App\Http\Controllers\SuperAdmin\CityController;
+use App\Http\Controllers\SuperAdmin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\SuperAdmin\CountryController;
 use App\Http\Controllers\SuperAdmin\CreditController;
+use App\Http\Controllers\SuperAdmin\CustomerController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\FlightController as AdminFlightController;
+use App\Http\Controllers\SuperAdmin\NotificationLogController;
 use App\Http\Controllers\SuperAdmin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\SuperAdmin\ReviewModerationController;
 use App\Http\Controllers\Webhooks\StripeWebhookController;
+use App\Http\Middleware\SetLandingLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
-use App\Http\Controllers\PublicSite\DestinationController;
-use App\Http\Controllers\SuperAdmin\AirlineController;
-use App\Http\Controllers\SuperAdmin\AirlineAdminController;
-use App\Http\Controllers\SuperAdmin\CustomerController;
-use App\Http\Controllers\SuperAdmin\ReviewModerationController;
-use App\Http\Controllers\SuperAdmin\AiConversationController as AdminAiConversationController;
-use App\Http\Controllers\SuperAdmin\NotificationLogController;
-use App\Http\Controllers\SuperAdmin\ContactMessageController as AdminContactMessageController;
-
-
-
-
-
-use App\Http\Controllers\AirlineAdmin\DashboardController as AirlineDashboardController;
-use App\Http\Controllers\AirlineAdmin\FlightController as AirlineFlightController;
-use App\Http\Controllers\AirlineAdmin\BookingController as AirlineBookingController;
-use App\Http\Controllers\AirlineAdmin\ReviewController as AirlineReviewController;
-
-
-
-
-
-
-
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
+Route::middleware(SetLandingLocale::class)->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
+});
 
 Route::post('/language/{locale}', function (Request $request, string $locale) {
     $request->session()->put('landing_locale', $locale);
 
-    return $request->expectsJson() ? response()->noContent() : back(fallback: route('home'));
+    return redirect()->route('home');
 })->whereIn('locale', ['en', 'ar'])->name('home.language');
 
 Route::redirect('/destinations/{country}', '/destinations');
@@ -206,8 +197,6 @@ $registerPanelRoutes = function (string $area, string $view, array $navigation) 
 $registerPanelRoutes('admin', 'super-admin.panel', $adminPages);
 $registerPanelRoutes('airline', 'airline-admin.panel', $airlinePages);
 
-
-
 Route::prefix('admin')->name('admin.')->middleware('role.super-admin')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/bookings', [SuperAdminBookingController::class, 'index'])->name('bookings');
@@ -230,9 +219,6 @@ Route::prefix('admin')->name('admin.')->middleware('role.super-admin')->group(fu
     Route::get('/countries/{country}/edit', [CountryController::class, 'edit'])->whereNumber('country')->name('countries.edit');
     Route::put('/countries/{country}', [CountryController::class, 'update'])->whereNumber('country')->name('countries.update');
     Route::delete('/countries/{country}', [CountryController::class, 'destroy'])->whereNumber('country')->name('countries.destroy');
-
-
-
 
     // Airlines
     Route::get('/airlines', [AirlineController::class, 'index'])->name('airlines');
@@ -272,9 +258,6 @@ Route::prefix('admin')->name('admin.')->middleware('role.super-admin')->group(fu
     Route::patch('/messages/{message}/handled', [AdminContactMessageController::class, 'markHandled'])->name('messages.handled');
 });
 
-
-
-
 // 1. Exclude these screens from $registerPanelRoutes when $area === 'airline':
 // ['flights', 'create', 'edit', 'flight']  (and later: 'dashboard', 'bookings', 'booking', 'reviews')
 
@@ -301,6 +284,10 @@ Route::prefix('airline')->name('airline.')->middleware('role.airline-admin')->gr
 
     // C6: Reviews
     Route::get('/reviews', [AirlineReviewController::class, 'index'])->name('reviews');
+
+    // Airline settings (origin country and logo)
+    Route::get('/settings', [AirlineSettingsController::class, 'edit'])->name('settings');
+    Route::put('/settings', [AirlineSettingsController::class, 'update'])->name('settings.update');
 });
 
 use App\Http\Controllers\Customer\PassportScanController;

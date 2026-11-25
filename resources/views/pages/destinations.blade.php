@@ -4,61 +4,55 @@
 @section('body-class', 'landing')
 
 @php
-    $cityPhotos = [
-        'amman' => 'amman.webp',
-        'dubai' => 'dubai.webp',
-        'istanbul' => 'istanbul.webp',
-        'paris' => 'paris.webp',
-        'london' => 'catalog/lond.webp',
-        'tokyo' => 'catalog/jp.webp',
-        'bangkok' => 'catalog/th.webp',
-    ];
-    $cityImageUrls = [
-        'cairo' => 'https://www.voyageegypte.fr/cdn/eg-public/citadelle_caire_vue_terasse.jpg',
-        'rome' => 'https://images.unsplash.com/photo-1711447402543-d9acc369fbe4?w=800&fit=crop',
-    ];
+    $currencyNames = ['JOD' => 'Jordanian Dinar', 'AED' => 'UAE Dirham', 'EGP' => 'Egyptian Pound', 'TRY' => 'Turkish Lira', 'SAR' => 'Saudi Riyal', 'QAR' => 'Qatari Riyal', 'GBP' => 'British Pound', 'EUR' => 'Euro', 'THB' => 'Thai Baht', 'JPY' => 'Japanese Yen', 'USD' => 'US Dollar'];
+    $currencyLabel = fn ($code) => $code ? ($code.(isset($currencyNames[$code]) ? ' - '.$currencyNames[$code] : '')) : null;
 @endphp
 
 @section('content')
 <div class="landing-wrap destination-directory">
     <h1>{{ __('Explore destinations') }}</h1>
-    @if($countries->contains(fn ($country) => $country->cities->isNotEmpty()))
+    <p class="muted">Each destination includes its country details, currency, and the cities and airports you can travel through.</p>
+    @if($countries->isNotEmpty())
         <div class="directory-grid">
             @foreach($countries as $country)
-                @foreach($country->cities as $city)
-                @php
-                    $slug = \Illuminate\Support\Str::slug($city->name);
-                    $photo = isset($cityPhotos[$slug])
-                        ? asset('assets/landing/'.$cityPhotos[$slug])
-                        : ($cityImageUrls[$slug] ?? null);
-                @endphp
-                <article class="panel directory-card">
-                    <div class="directory-photo">
-                        @if($photo)
-                            <img src="{{ $photo }}" data-directory-photo alt="" loading="lazy" decoding="async" width="640" height="360">
-                        @endif
-                    </div>
+                <article class="panel directory-card destination-group">
                     <div class="directory-copy">
-                        <p class="directory-country">{{ __($country->name) }}</p>
-                        <h2>{{ __($city->name) }}</h2>
-                        @if($city->best_season)<p><strong>{{ __('Best season:') }}</strong> {{ __($city->best_season) }}</p>@endif
-                        @if($city->airport_transport)<p><strong>{{ __('Airport transport:') }}</strong> {{ __($city->airport_transport) }}</p>@endif
-                        @if($city->tips)<p><strong>{{ __('Travel tips:') }}</strong> {{ __($city->tips) }}</p>@endif
-                        @if($city->airports->isNotEmpty())
-                            <h3>{{ __('Airports') }}</h3>
-                            <ul>
-                                @foreach($city->airports as $airport)
-                                    <li>{{ __($airport->name) }} ({{ $airport->code }})</li>
-                                @endforeach
-                            </ul>
-                        @endif
+                        <p class="directory-country">Destination</p>
+                        <h2>{{ $country->name }} @if($country->code)<span class="muted">({{ $country->code }})</span>@endif</h2>
+                        <div class="form-grid destination-meta-grid" style="margin-top:.75rem">
+                            <p><strong>Currency:</strong> {{ $currencyLabel($country->currency) ?: '—' }}</p>
+                            <p><strong>Language:</strong> {{ $country->language ?: '—' }}</p>
+                            @if($country->local_apps)
+                                <p class="col-span-2"><strong>Local apps:</strong> {{ $country->local_apps }}</p>
+                            @endif
+                        </div>
+
+                        <section class="section" aria-label="Cities in {{ $country->name }}">
+                            <h3>Cities and airports in this destination</h3>
+                            @forelse($country->cities as $city)
+                                <div class="panel" style="margin-top:.75rem">
+                                    <h4 style="margin:0 0 .35rem">{{ $city->name }}</h4>
+                                    @if($city->best_season)<p><strong>Best season:</strong> {{ $city->best_season }}</p>@endif
+                                    @if($city->airport_transport)<p><strong>Airport transport:</strong> {{ $city->airport_transport }}</p>@endif
+                                    @if($city->tips)<p><strong>Travel tips:</strong> {{ $city->tips }}</p>@endif
+                                    @if($city->airports->isNotEmpty())
+                                        <p><strong>Airports:</strong>
+                                            {{ $city->airports->map(fn ($airport) => $airport->name.' ('.$airport->code.')')->join(', ') }}
+                                        </p>
+                                    @else
+                                        <p class="muted">Airport information coming soon.</p>
+                                    @endif
+                                </div>
+                            @empty
+                                <p class="muted">City and airport information will be available soon.</p>
+                            @endforelse
+                        </section>
                     </div>
                 </article>
-                @endforeach
             @endforeach
         </div>
     @else
-        <p>{{ __('Destination information will be available soon.') }}</p>
+        <p>Destination information will be available soon.</p>
     @endif
 </div>
 @endsection

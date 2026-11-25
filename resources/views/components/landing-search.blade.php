@@ -3,7 +3,7 @@
         ->mapWithKeys(fn ($airport) => [$airport->code => $airport->city->name.' · '.__($airport->city->name, [], 'ar').' · '.$airport->name.' · '.__($airport->name, [], 'ar')])->all();
     $selectedTrip = str_replace('_', '-', old('trip', request('trip', 'round-trip')));
 @endphp
-<form class="landing-search" method="GET" action="{{ route('flights.search') }}"
+<form {{ $attributes->merge(['class' => 'landing-search']) }} method="GET" action="{{ route('flights.search') }}"
     data-traveler-one="{{ __('1 traveler') }}" data-traveler-many="{{ __(':count travelers') }}"
     data-swap-error="{{ __('Choose a different arrival airport.') }}">
     <div class="landing-search-options">
