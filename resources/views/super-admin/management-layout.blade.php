@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', trim($__env->yieldContent('admin-title', 'Super Admin')))
+@section('title', trim($__env->yieldContent('admin-title', 'Platform Admin')))
 @section('body-class', 'super-admin-body')
 @section('navigation')@endsection
 @section('footer-links')@endsection
@@ -16,7 +16,7 @@
             ['Airlines', 'admin.airlines', 'plane'],
             ['Airline Admins', 'admin.airline-admins', 'Customers'],
             ['Customers', 'admin.customers', 'Customers'],
-            ['Countries', 'admin.countries', 'Countries'],
+            ['Destinations', 'admin.countries', 'Countries'],
             ['Credits', 'admin.credits', 'card'],
             ['Airports', 'admin.airports', 'Airports'],
             ['Flights', 'admin.flights', 'plane'],
@@ -31,8 +31,8 @@
     <div class="admin-frame">
         <button class="admin-menu-toggle" type="button" aria-expanded="false" aria-controls="admin-sidebar"><x-landing-icon name="menu" /> <span>{{ __('Menu') }}</span></button>
         <aside class="admin-sidebar" id="admin-sidebar">
-            <a class="admin-brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('assets/yallateer-wordmark.png') }}" alt="Yalla Teer"><span>{{ __('SUPER ADMIN') }}</span></a>
-            <nav aria-label="{{ __('Super Admin navigation') }}">
+            <a class="admin-brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('assets/yallateer-wordmark.png') }}" alt="Yalla Teer"><span>{{ __('PLATFORM ADMIN') }}</span></a>
+            <nav aria-label="{{ __('Platform Admin navigation') }}">
                 @foreach($adminNavigation as [$label, $routeName, $icon])
                     <a class="admin-nav-link {{ (request()->routeIs($routeName . '*') || ($routeName === 'admin.bookings' && request()->routeIs('admin.booking'))) ? 'active' : '' }}" href="{{ route($routeName) }}"><span class="admin-nav-icon" aria-hidden="true"><x-landing-icon :name="$icon" /></span>{{ __($label) }}</a>
                 @endforeach
@@ -40,7 +40,7 @@
         </aside>
         <div class="admin-main">
             <header class="admin-topbar">
-                <span class="admin-topbar-location">{{ __('Yalla Teer') }} <span class="admin-topbar-separator" aria-hidden="true">/</span> <strong>{{ trim($__env->yieldContent('admin-title', 'Super Admin')) }}</strong></span>
+                <span class="admin-topbar-location">{{ __('Yalla Teer') }} <span class="admin-topbar-separator" aria-hidden="true">/</span> <strong>{{ trim($__env->yieldContent('admin-title', 'Platform Admin')) }}</strong></span>
                 <nav class="admin-topbar-actions" aria-label="{{ __('Admin account actions') }}">
                     <x-theme-switch />
                     <a href="{{ route('home') }}">{{ __('View website') }} <span aria-hidden="true">&#8599;</span></a>

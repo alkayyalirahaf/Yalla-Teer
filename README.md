@@ -11,7 +11,7 @@ Yalla Teer is a flight reservation platform built with Laravel 12, Blade, Tailwi
 - **AI travel assistant powered by Google Gemini:** answer travel questions, find or compare flights, and provide travel tips. The assistant uses flight results from the application and does not make bookings or payments.
 - **AI passport data extraction:** help fill traveler details from a passport image when Gemini is configured; users should review extracted information before using it.
 - Airline administration for flights, bookings, and reviews.
-- Super Admin tools for the dashboard, airlines, airline administrators, customers, countries, cities, airports, flights, bookings, payments, credits, reviews, AI conversations, notification logs, and contact messages.
+- Platform Admin tools for the dashboard, airlines, airline administrators, customers, destinations, cities, airports, flights, bookings, payments, credits, reviews, AI conversations, notification logs, and contact messages.
 - Review moderation, customer credit history, contact messages, and notification logs.
 - Responsive Blade interface with Yalla Teer branding.
 
@@ -88,8 +88,8 @@ For an existing local database, apply demo fixtures with `php artisan db:seed --
 - `/compare` — compare selected flights
 - `/assistant` — AI travel assistant (customer sign-in required)
 - `/my/bookings` — customer bookings
-- `/admin/login` — Super Admin sign-in
-- `/admin` — Super Admin dashboard
+- `/admin/login` — Platform Admin sign-in
+- `/admin` — Platform Admin dashboard
 - `/admin/airlines` — airline management
 - `/airline/login` — airline administrator sign-in
 

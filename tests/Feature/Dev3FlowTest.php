@@ -106,7 +106,7 @@ class Dev3FlowTest extends TestCase
         $admin->superAdmin()->create([]);
         $this->actingAs($admin);
         $data = ['name' => 'Jordan', 'code' => 'jo', 'currency' => 'JOD', 'language' => 'Arabic'];
-        $this->get(route('admin.countries.create'))->assertOk()->assertSee('Super Admin navigation');
+        $this->get(route('admin.countries.create'))->assertOk()->assertSee('Platform Admin navigation');
         $this->post(route('admin.countries.store'), $data)->assertRedirect(route('admin.countries'));
         $country = Country::firstOrFail();
         $this->assertSame('JO', $country->code);
@@ -116,7 +116,7 @@ class Dev3FlowTest extends TestCase
         $this->get(route('admin.countries'))->assertOk()->assertSee('Jordan Updated');
         City::create(['country_id' => $country->id, 'name' => 'Amman']);
         $this->delete(route('admin.countries.destroy', $country))->assertSessionHasErrors('country');
-        $this->get(route('admin.dashboard'))->assertOk()->assertViewIs('super-admin.panel')->assertSee('Super Admin Dashboard')->assertDontSee('Staff interface preview.');
+        $this->get(route('admin.dashboard'))->assertOk()->assertViewIs('super-admin.panel')->assertSee('Platform Admin Dashboard')->assertDontSee('Staff interface preview.');
         $this->get(route('faq'))->assertOk()->assertViewIs('pages.information');
         $this->get(route('terms'))->assertOk()->assertViewIs('pages.information');
         $empty = Country::create(['name' => 'Empty', 'code' => 'AE', 'currency' => 'AED', 'language' => 'Arabic']);

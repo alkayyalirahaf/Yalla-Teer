@@ -14,7 +14,7 @@
 <h1>{{ __($title) }}</h1>
 @unless(isset($statistics) || isset($transactions))<p class="notice">{{ __('Staff interface preview. No live records or management actions are connected.') }}</p>@endunless
 @if($area === 'admin')
-    <nav class="actions section" aria-label="{{ __('Administration') }}"><a class="button secondary" href="{{ route('admin.dashboard') }}">{{ __('Dashboard') }}</a><a class="button secondary" href="{{ route('admin.countries') }}">{{ __('Countries') }}</a><a class="button secondary" href="{{ route('admin.credits') }}">{{ __('Credits') }}</a></nav>
+    <nav class="actions section" aria-label="{{ __('Administration') }}"><a class="button secondary" href="{{ route('admin.dashboard') }}">{{ __('Dashboard') }}</a><a class="button secondary" href="{{ route('admin.countries') }}">{{ __('Destinations') }}</a><a class="button secondary" href="{{ route('admin.credits') }}">{{ __('Credits') }}</a></nav>
 @endif
 @switch($screen)
     @case('credits')

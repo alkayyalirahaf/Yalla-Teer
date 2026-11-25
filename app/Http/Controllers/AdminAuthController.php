@@ -11,7 +11,7 @@ class AdminAuthController
     public function showLogin()
     {
         return view('auth.login', [
-            'title' => 'Super Admin Login',
+            'title' => 'Platform Admin Login',
             'action' => route('admin.login.submit'),
         ]);
     }

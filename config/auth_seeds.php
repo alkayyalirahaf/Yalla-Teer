@@ -7,7 +7,7 @@ return [
         'password' => env('AUTH_SEED_CUSTOMER_PASSWORD'),
     ],
     'super_admin' => [
-        'name' => env('AUTH_SEED_SUPER_ADMIN_NAME', 'Yalla Teer Super Admin'),
+        'name' => env('AUTH_SEED_SUPER_ADMIN_NAME', 'Yalla Teer Platform Admin'),
         'email' => env('AUTH_SEED_SUPER_ADMIN_EMAIL', 'super-admin@example.test'),
         'password' => env('AUTH_SEED_SUPER_ADMIN_PASSWORD'),
     ],

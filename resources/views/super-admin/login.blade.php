@@ -1,1 +1,1 @@
-@extends('auth.staff-login', ['title' => 'Super Admin Login', 'submitRoute' => 'admin.login.submit'])
+@extends('auth.staff-login', ['title' => 'Platform Admin Login', 'submitRoute' => 'admin.login.submit'])
