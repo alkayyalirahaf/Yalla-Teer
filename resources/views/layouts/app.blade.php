@@ -2,12 +2,17 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ in_array(app()->getLocale(), ['ar', 'fa', 'he', 'ur'], true) ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
+    <script src="{{ asset('assets/theme.js') }}"></script>
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Travel') | Yalla Teer</title>
-    <link rel="icon" href="{{ asset('assets/YallaTeer-Logo-02.png') }}">
+    <link rel="icon" href="{{ asset('assets/yallateer-wordmark.png') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&amp;display=swap">
     @section('display-font')@show
+    <link rel="stylesheet" href="{{ asset('assets/theme-tokens.css') }}">
+    @stack('framework-styles')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('assets/theme-switch.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/assistant-shortcut.css') }}">
 </head>
 <body class="@yield('body-class')">
@@ -15,8 +20,9 @@
     <header class="site-header">
         <div class="wrap bar">
             <a class="brand" href="{{ route('home') }}">
-                <img src="{{ asset('assets/YallaTeer-Logo-02.png') }}" width="112" height="72" alt="{{ __('YallaTeer home') }}">
+                <img src="{{ asset('assets/yallateer-wordmark.png') }}" width="174" height="59" alt="{{ __('YallaTeer home') }}">
             </a>
+            <x-theme-switch />
             <button class="menu-toggle" type="button" aria-label="{{ __('Open navigation') }}" data-open-label="{{ __('Open navigation') }}" data-close-label="{{ __('Close navigation') }}" aria-expanded="false" aria-controls="primary-nav" hidden>
                 <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
             </button>
@@ -51,7 +57,7 @@
                 @endphp
                 @foreach($links as $key => [$path, $label])
                     @unless(str_contains($path, '{'))
-                        <a @if(request()->routeIs("$area.$key") || ($area === 'my' && $key === 'bookings' && request()->routeIs('my.booking', 'book.confirmation', 'book.review'))) aria-current="page" @endif href="{{ route("$area.$key") }}">{{ $label }}</a>
+                        <a @if(request()->routeIs("$area.$key") || ($area === 'my' && $key === 'bookings' && request()->routeIs('my.booking', 'book.confirmation', 'book.review'))) aria-current="page" @endif href="{{ route("$area.$key") }}">{{ __($label) }}</a>
                     @endunless
                 @endforeach
             </nav>
@@ -60,7 +66,7 @@
     </main>
     <footer class="site-footer">
         <div class="wrap bar">
-            <a class="brand" href="{{ route('home') }}"><img src="{{ asset('assets/YallaTeer-Logo-02.png') }}" width="112" height="72" alt="{{ __('YallaTeer home') }}"></a>
+            <a class="brand" href="{{ route('home') }}"><img src="{{ asset('assets/yallateer-wordmark.png') }}" width="174" height="59" alt="{{ __('YallaTeer home') }}"></a>
             @section('footer-links')
             <nav aria-label="{{ __('Footer') }}">
                 @foreach(['about' => 'About', 'faq' => 'FAQ', 'terms' => 'Terms', 'privacy' => 'Privacy', 'contact' => 'Contact', 'assistant' => 'AI assistant'] as $name => $label)
@@ -71,6 +77,8 @@
         </div>
     </footer>
     <div class="site-toasts">@stack('toasts')</div>
-    <x-assistant-shortcut />
+    @unless(request()->is('admin', 'admin/*', 'airline', 'airline/*'))
+        <x-assistant-shortcut />
+    @endunless
 </body>
 </html>

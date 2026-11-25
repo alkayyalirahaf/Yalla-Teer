@@ -3,18 +3,18 @@
 @section('title', $title)
 
 @section('content')
-<h1>{{ $title }}</h1>
+<header class="workspace-heading wallet-heading"><h1>{{ __($title) }}</h1>
 
-<section class="panel" aria-labelledby="credit-balance-heading">
-    <p class="eyebrow">Current balance</p>
+<section class="wallet-balance" aria-labelledby="credit-balance-heading">
+    <p class="eyebrow">{{ __('Current balance') }}</p>
     <h2 id="credit-balance-heading">JOD {{ number_format((float) $customer->credit_balance, 2) }}</h2>
-</section>
+</section></header>
 
 <section class="panel table-wrap section">
     <table>
-        <caption>Credit activity</caption>
+        <caption>{{ __('Credit activity') }}</caption>
         <thead>
-            <tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance after</th><th>Note</th></tr>
+            <tr><th>{{ __('Date') }}</th><th>{{ __('Type') }}</th><th>{{ __('Amount') }}</th><th>{{ __('Balance after') }}</th><th>{{ __('Note') }}</th></tr>
         </thead>
         <tbody>
             @forelse($transactions as $transaction)
@@ -26,11 +26,11 @@
                     <td>{{ $transaction->note ?: '—' }}</td>
                 </tr>
             @empty
-                <tr><td colspan="5">No credit transactions yet.</td></tr>
+                <tr><td colspan="5">{{ __('No credit transactions yet.') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 </section>
 
-<div class="section">{{ $transactions->links() }}</div>
+<div class="section">{{ $transactions->links('super-admin.pagination') }}</div>
 @endsection

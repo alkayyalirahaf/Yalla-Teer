@@ -11,11 +11,28 @@ use Illuminate\Validation\Rule;
 
 class AirlineAdminController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $airlineAdmins = AirlineAdmin::with(['user', 'airline'])->latest()->paginate(15);
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:150'],
+            'airline_id' => ['nullable', 'integer', 'exists:airlines,id'],
+        ]);
 
-        return view('super-admin.airline-admins.index', compact('airlineAdmins'));
+        $airlineAdmins = AirlineAdmin::with(['user', 'airline'])
+            ->when($filters['search'] ?? null, function ($query, $search): void {
+                $query->whereHas('user', function ($userQuery) use ($search): void {
+                    $userQuery->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($filters['airline_id'] ?? null, fn ($query, $airlineId) => $query->where('airline_id', $airlineId))
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
+
+        $airlines = Airline::orderBy('name')->get(['id', 'name']);
+
+        return view('super-admin.airline-admins.index', compact('airlineAdmins', 'airlines', 'filters'));
     }
 
     public function create()

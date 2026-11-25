@@ -14,7 +14,7 @@
         <a href="#how-it-works">{{ __('How It Works') }}</a>
     </div>
     <div class="landing-nav-actions">
-        <x-landing-language />
+
         <x-nav-account />
         <a class="button landing-nav-book" href="#flight-search">{{ __('Find a Flight') }}</a>
     </div>
@@ -39,20 +39,14 @@
             <a class="button secondary" href="#ai-copilot">{{ __('Meet Your AI Copilot') }}</a>
         </div>
     </div>
+    <div class="landing-wrap reservation-tools"><x-landing-travel-tools /></div>
 </section>
 
 <div class="landing-journey">
-    <svg class="journey-path" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-        <path pathLength="1" d="M940 0 C930 120 40 100 60 270 S970 350 930 490 S75 525 85 680 S920 755 920 1000"/>
-    </svg>
-
-    <div class="landing-wrap search-overlap">
-        <x-landing-travel-tools />
-    </div>
 
     <section id="destinations" class="destination-showcase" aria-labelledby="destination-showcase-title">
-        <h2 id="destination-showcase-title">{{ __('See the world') }}</h2>
-        <div class="landing-wrap">
+        <div class="landing-wrap showcase-heading">
+            <h2 id="destination-showcase-title">{{ __('See the world') }}</h2>
             <a class="destination-directory-link" href="{{ route('destinations') }}">
                 {{ __('Browse all destinations') }} <span aria-hidden="true">&#8599;</span>
             </a>

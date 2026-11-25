@@ -26,7 +26,7 @@ class CityController implements HasMiddleware
 
     public function index()
     {
-        $cities = City::with('country')->withCount('airports')->orderBy('name')->orderBy('id')->paginate(15);
+        $cities = City::with('country')->withCount('airports')->orderBy('name')->orderBy('id')->paginate(5);
 
         return view('super-admin.cities.index', compact('cities'));
     }

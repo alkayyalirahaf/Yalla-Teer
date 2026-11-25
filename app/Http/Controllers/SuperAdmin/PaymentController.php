@@ -26,7 +26,7 @@ class PaymentController
             })
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.payments.index', compact('payments', 'filters'));

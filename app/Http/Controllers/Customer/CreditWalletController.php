@@ -18,7 +18,7 @@ class CreditWalletController
             'transactions' => $customer->creditTransactions()
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
-                ->paginate(10),
+                ->paginate(5),
         ]);
     }
 }

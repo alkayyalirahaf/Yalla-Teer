@@ -1,8 +1,7 @@
-<div class="landing-language">
-    @foreach(['en' => 'English', 'ar' => 'العربية'] as $locale => $language)
-        <form method="POST" action="{{ route('home.language', $locale) }}">
-            @csrf
-            <button type="submit" lang="{{ $locale }}" aria-label="{{ $language }}" aria-pressed="{{ app()->isLocale($locale) ? 'true' : 'false' }}">{{ strtoupper($locale) }}</button>
-        </form>
-    @endforeach
-</div>
+@php($arabic = app()->isLocale('ar'))
+<form method="POST" action="{{ route('home.language', $arabic ? 'en' : 'ar') }}" data-language-switch>
+    @csrf
+    <button class="preference-toggle" type="submit" role="switch" aria-checked="{{ $arabic ? 'true' : 'false' }}" aria-label="{{ __('Language') }} · العربية" title="{{ $arabic ? 'English' : 'العربية' }}">
+        <span class="toggle-track" aria-hidden="true"><span></span></span><span>{{ $arabic ? 'عربي' : 'EN' }}</span>
+    </button>
+</form>

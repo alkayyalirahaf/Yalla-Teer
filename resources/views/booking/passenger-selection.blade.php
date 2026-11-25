@@ -1,22 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Passengers')
+@section('title', __('Passengers'))
 
 @section('content')
 <header class="passenger-heading">
-    <a class="selection-back" href="{{ route('flights.search', session('dev3.search_selection.filters', [])) }}">← Back to flight results</a>
-    <h1 class="flight-page-title">Passengers</h1>
+    <a class="selection-back" href="{{ route('flights.search', session('dev3.search_selection.filters', [])) }}">{{ __('← Back to flight results') }}</a>
+    <h1 class="flight-page-title">{{ __('Passengers') }}</h1>
 </header>
 <div class="passenger-layout">
     <section class="panel passenger-panel">
-        <h2>Travelers</h2>
+        <h2>{{ __('Travelers') }}</h2>
         <form class="stack" method="POST" action="{{ route('book.passengers.store') }}">
             @csrf
             <input type="hidden" name="selection_id" value="{{ $selectionId }}">
             @error('selection')<p class="notice error">{{ $message }}</p>@enderror
             @foreach($travelerTypes as $index => $type)
                 <fieldset class="form-grid passenger-fields">
-                    <legend>Passenger {{ $loop->iteration }} · {{ ucfirst($type) }}</legend>
+                    <legend>{{ __('Passenger') }} {{ $loop->iteration }} · {{ __(ucfirst($type)) }}</legend>
                     <x-passport-scan :passenger-index="$index" />
                     <div>
                         <x-travel-field :name="'passengers['.$index.'][first_name]'" label="First / given name" :value="old('passengers.'.$index.'.first_name', $draft['passengers'][$index]['first_name'] ?? null)" maxlength="100" required />
@@ -58,25 +58,25 @@
             @endforeach
             @error('passengers')<p class="notice error">{{ $message }}</p>@enderror
             <fieldset class="form-grid passenger-fields passenger-contact">
-                <legend>Booking contact</legend>
+                <legend>{{ __('Booking contact') }}</legend>
                 <x-travel-field name="contact_email" label="Email address" type="email" :value="$draft['contact_email'] ?? request()->user()->email" maxlength="255" required />
                 <x-travel-field name="contact_phone" label="Phone number (optional)" type="tel" :value="$draft['contact_phone'] ?? null" maxlength="30" />
             </fieldset>
             <div class="passenger-actions">
-                <button class="button" type="submit">Continue to seats <span aria-hidden="true">→</span></button>
+                <button class="button" type="submit">{{ __('Continue to seats') }} <span aria-hidden="true">→</span></button>
             </div>
         </form>
     </section>
     <aside class="panel passenger-panel passenger-summary">
-        <h2>Trip summary</h2>
+        <h2>{{ __('Trip summary') }}</h2>
         @foreach($cabins as $label => $cabin)
-            <h3>{{ $label }}</h3>
+            <h3>{{ __($label) }}</h3>
             <dl>
-                <div><dt>Route</dt><dd>{{ $cabin->flight->originAirport->code }} &rarr; {{ $cabin->flight->destinationAirport->code }}</dd></div>
-                <div><dt>Flight</dt><dd>{{ $cabin->flight->flight_number }}</dd></div>
-                <div><dt>Departure</dt><dd>{{ $cabin->flight->departure_at->format('d M Y, H:i') }}</dd></div>
-                <div><dt>Cabin</dt><dd>{{ ucfirst($cabin->class) }}</dd></div>
-                <div><dt>Current base fare per traveler</dt><dd>JOD {{ $cabin->price }}</dd></div>
+                <div><dt>{{ __('Route') }}</dt><dd>{{ $cabin->flight->originAirport->code }} &rarr; {{ $cabin->flight->destinationAirport->code }}</dd></div>
+                <div><dt>{{ __('Flight') }}</dt><dd>{{ $cabin->flight->flight_number }}</dd></div>
+                <div><dt>{{ __('Departure') }}</dt><dd>{{ $cabin->flight->departure_at->format('d M Y, H:i') }}</dd></div>
+                <div><dt>{{ __('Cabin') }}</dt><dd>{{ __(ucfirst($cabin->class)) }}</dd></div>
+                <div><dt>{{ __('Current base fare per traveler') }}</dt><dd>JOD {{ $cabin->price }}</dd></div>
             </dl>
         @endforeach
     </aside>

@@ -25,7 +25,7 @@ class AiConversationController
 
     private function chatData(\App\Models\Customer $customer, AiService $ai): array
     {
-        $conversations = $customer->aiConversations()->latest('id')->paginate(15);
+        $conversations = $customer->aiConversations()->latest('id')->paginate(5);
         $available = $ai->available();
         $airports = Airport::with('city')->orderBy('code')->get();
         $cities = City::orderBy('name')->get();

@@ -8,11 +8,11 @@
     }
 @endphp
 <label class="field">
-    <span>{{ $label }}</span>
+    <span>{{ __($label) }}</span>
     @if($options !== null)
         <select name="{{ $name }}" @required($required) {{ $attributes }}>
             @foreach($options as $key => $description)
-                <option value="{{ $key }}" @selected((string) old($name, $value) === (string) $key)>{{ $description }}</option>
+                <option value="{{ $key }}" @selected((string) old($name, $value) === (string) $key)>{{ __($description) }}</option>
             @endforeach
         </select>
     @elseif($type === 'textarea')

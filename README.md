@@ -2,6 +2,19 @@
 
 Yalla Teer is a flight reservation platform built with Laravel 12, Blade, Tailwind CSS, and MySQL. Travelers can search and compare flights, enter passenger details, choose seats, and complete checkout. Airline staff manage flights and seat inventory, and platform administrators oversee airlines, bookings, and payments.
 
+## Features
+
+- Search available flights and compare fares, schedules, baggage allowances, and seats.
+- Customer registration, sign in, traveler profiles, and booking history.
+- Multi-step booking flow with passenger details, seat selection, booking lookup, and ticket views.
+- Stripe Checkout integration for booking payments (requires Stripe credentials and webhook configuration).
+- **AI travel assistant powered by Google Gemini:** answer travel questions, find or compare flights, and provide travel tips. The assistant uses flight results from the application and does not make bookings or payments.
+- **AI passport data extraction:** help fill traveler details from a passport image when Gemini is configured; users should review extracted information before using it.
+- Airline administration for flights, bookings, and reviews.
+- Super Admin tools for the dashboard, airlines, airline administrators, customers, countries, cities, airports, flights, bookings, payments, credits, reviews, AI conversations, notification logs, and contact messages.
+- Review moderation, customer credit history, contact messages, and notification logs.
+- Responsive Blade interface with Yalla Teer branding.
+
 ## Local setup
 
 Use PHP 8.2 or later with `pdo_mysql`, Composer, Node.js with npm, and a running MySQL server. If you use XAMPP, start MySQL from its control panel.
@@ -37,6 +50,10 @@ Use PHP 8.2 or later with `pdo_mysql`, Composer, Node.js with npm, and a running
 
    Open [Yalla Teer locally](http://127.0.0.1:8011/).
 
+### SQLite alternative
+
+The default `.env.example` uses SQLite. To use it for local development, keep `DB_CONNECTION=sqlite` and create an empty `database/database.sqlite` if it does not exist. Enable `pdo_sqlite`, then follow the same key generation, migration, seeding, build, and serve steps above.
+
 ## Demo accounts
 
 The local demo accounts share the password `FlyNow-Demo-2026!`.
@@ -64,7 +81,26 @@ For an existing local database, apply demo fixtures with `php artisan db:seed --
 - Gemini powers the optional travel assistant. See the [assistant setup](docs/gemini-assistant.md).
 - Run the test suite with `php artisan test`, or run `php artisan test --filter=DemoSeederTest` to check the demo fixtures. The test configuration uses in-memory SQLite and requires `pdo_sqlite`.
 
+## Useful routes
+
+- `/` — home page
+- `/flights` — flight search
+- `/compare` — compare selected flights
+- `/assistant` — AI travel assistant (customer sign-in required)
+- `/my/bookings` — customer bookings
+- `/admin/login` — Super Admin sign-in
+- `/admin` — Super Admin dashboard
+- `/admin/airlines` — airline management
+- `/airline/login` — airline administrator sign-in
+
 ## Project references
 
 - [Entity relationship diagram](https://dbdiagram.io/d/6ace73bde308025ea5e4d931)
 - [Local demo data reference](docs/demo-data.md)
+- [ERD PDF](assets/ERD.pdf)
+
+## Repository and submission notes
+
+The repository's `.gitignore` excludes local dependencies, environment secrets, and generated assets, including `vendor/`, `node_modules/`, `.env`, and `public/build/`. Install dependencies and build assets using the commands above. Never submit a populated `.env` file or API keys.
+
+[Project Trello board](https://trello.com/b/GwcxKa78/yalla-%D9%86%D8%B7%D9%8A%D8%B1)

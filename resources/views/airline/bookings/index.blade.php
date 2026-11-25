@@ -1,44 +1,46 @@
 @extends('airline-admin.flights.layout')
 
-@section('title', 'Airline Bookings')
+@section('title', __('Airline Bookings'))
 
 @section('flight-content')
 <div class="flight-card">
-    <div><h1>Bookings</h1><p>Bookings that include at least one of your airline's flights.</p></div>
+    <div><h1>{{ __('Bookings') }}</h1><p>{{ __('Bookings that include at least one of your airline\'s flights.') }}</p></div>
 </div>
 
+<x-management-filters>
 <form method="GET" action="{{ route('airline.bookings') }}" class="panel form-grid section">
     <label class="field">
-        <span>Booking code</span>
-        <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search booking code">
+        <span>{{ __('Booking code') }}</span>
+        <input aria-label="{{ __('Search booking code') }}" type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('Search booking code') }}">
     </label>
     <label class="field">
-        <span>Status</span>
-        <select name="status">
-            <option value="">All statuses</option>
+        <span>{{ __('Status') }}</span>
+        <select aria-label="{{ __('Status') }}" name="status">
+            <option value="">{{ __('All statuses') }}</option>
             @foreach(['pending', 'confirmed', 'cancelled', 'completed'] as $status)
-                <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ ucfirst($status) }}</option>
+                <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ __(ucfirst($status)) }}</option>
             @endforeach
         </select>
     </label>
     <div class="actions">
-        <button class="button" type="submit">Filter</button>
-        <a class="button secondary" href="{{ route('airline.bookings') }}">Clear</a>
+        <button class="button" type="submit">{{ __('Filter') }}</button>
+        <a class="button secondary" href="{{ route('airline.bookings') }}">{{ __('Clear') }}</a>
     </div>
 </form>
+</x-management-filters>
 
 <section class="panel table-wrap section">
     <table>
-        <caption>Airline bookings</caption>
+        <caption>{{ __('Airline bookings') }}</caption>
         <thead>
             <tr>
-                <th scope="col">Booking code</th>
-                <th scope="col">Customer</th>
-                <th scope="col">Flights</th>
-                <th scope="col">Status</th>
-                <th scope="col">Amount paid</th>
-                <th scope="col">Created</th>
-                <th scope="col">Details</th>
+                <th scope="col">{{ __('Booking code') }}</th>
+                <th scope="col">{{ __('Customer') }}</th>
+                <th scope="col">{{ __('Flights') }}</th>
+                <th scope="col">{{ __('Status') }}</th>
+                <th scope="col">{{ __('Amount paid') }}</th>
+                <th scope="col">{{ __('Created') }}</th>
+                <th scope="col">{{ __('Details') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -47,17 +49,17 @@
                     <th scope="row">{{ $booking->code }}</th>
                     <td>{{ $booking->customer?->user?->name ?? '—' }}</td>
                     <td>{{ $booking->airline_flights_count }}</td>
-                    <td><span class="badge">{{ ucfirst($booking->status) }}</span></td>
+                    <td><span class="badge">{{ __(ucfirst($booking->status)) }}</span></td>
                     <td>JOD {{ number_format((float) $booking->amount_paid, 2) }}</td>
                     <td>{{ $booking->created_at->format('Y-m-d H:i') }}</td>
-                    <td><a class="quiet" href="{{ route('airline.booking', $booking) }}">View booking</a></td>
+                    <td><a class="quiet" href="{{ route('airline.booking', $booking) }}">{{ __('View booking') }}</a></td>
                 </tr>
             @empty
-                <tr><td colspan="7">No bookings found.</td></tr>
+                <tr><td colspan="7">{{ __('No bookings found.') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 </section>
 
-{{ $bookings->links() }}
+{{ $bookings->links('super-admin.pagination') }}
 @endsection

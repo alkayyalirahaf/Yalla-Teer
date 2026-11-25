@@ -19,7 +19,7 @@ class CustomerController
                 });
             })
             ->latest()
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         return view('super-admin.customers.index', compact('customers'));
@@ -28,7 +28,7 @@ class CustomerController
     public function show(Customer $customer)
     {
         $customer->load('user');
-        $bookings = $customer->bookings()->latest()->paginate(10);
+        $bookings = $customer->bookings()->latest()->paginate(5);
 
         return view('super-admin.customers.show', compact('customer', 'bookings'));
     }

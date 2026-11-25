@@ -1,0 +1,236 @@
+﻿OMAR ALTOOM - FILE CONTRIBUTION INVENTORY
+
+Source: Git commits authored by omar.altoom.ot@gmail.com.
+Non-merge commits only; merge commits are excluded so teammates work imported by merges is not attributed to Omar.
+These files were added, modified, renamed or deleted by at least one authored commit. This does not imply exclusive ownership or authorship of their current full contents.
+
+Project root: C:\Users\Orange\Desktop\laravel_project_FLYNOW\Laravel-Project
+Unique historical paths: 176
+Existing project files: 137
+Removed or renamed project paths: 39
+Dependency paths: 0
+
+=== EXISTING PROJECT FILES ===
+
+[.env.example]
+.env.example
+
+[.gitignore]
+.gitignore
+
+[app]
+app/Http/Controllers/AdminAuthController.php
+app/Http/Controllers/AirlineAdmin/FlightController.php
+app/Http/Controllers/Auth/AirlineAdminSessionController.php
+app/Http/Controllers/Customer/AiConversationController.php
+app/Http/Controllers/Customer/ReviewController.php
+app/Http/Controllers/PublicFlightController.php
+app/Http/Controllers/PublicSite/CompareController.php
+app/Http/Controllers/PublicSite/FlightController.php
+app/Http/Controllers/PublicSite/InformationController.php
+app/Http/Controllers/SuperAdmin/CountryController.php
+app/Http/Controllers/SuperAdmin/CreditController.php
+app/Http/Controllers/SuperAdmin/DashboardController.php
+app/Models/AiConversation.php
+app/Models/Airline.php
+app/Models/AirlineAdmin.php
+app/Models/Airport.php
+app/Models/Booking.php
+app/Models/BookingFlight.php
+app/Models/City.php
+app/Models/ContactMessage.php
+app/Models/Country.php
+app/Models/CreditTransaction.php
+app/Models/Customer.php
+app/Models/Flight.php
+app/Models/FlightClass.php
+app/Models/NotificationLog.php
+app/Models/Passenger.php
+app/Models/Payment.php
+app/Models/Recommendation.php
+app/Models/Review.php
+app/Models/Seat.php
+app/Models/SuperAdmin.php
+app/Models/Ticket.php
+app/Models/User.php
+app/Services/AiService.php
+app/Services/AuthService.php
+app/Services/CreditService.php
+app/Services/FlightSearchService.php
+app/Services/PassportExtraction.php
+app/Services/PaymentService.php
+app/Services/PrePaymentCheck.php
+app/Services/SearchSelectionService.php
+
+[composer.lock]
+composer.lock
+
+[config]
+config/database.php
+config/services.php
+
+[database]
+database/migrations/0001_01_01_000000_create_users_table.php
+database/migrations/2026_11_18_163211_create_countries_table.php
+database/migrations/2026_11_18_163212_create_cities_table.php
+database/migrations/2026_11_18_163213_create_airlines_table.php
+database/migrations/2026_11_18_163213_create_airports_table.php
+database/migrations/2026_11_18_163214_create_airline_admins_table.php
+database/migrations/2026_11_18_163214_create_customers_table.php
+database/migrations/2026_11_18_163214_create_super_admins_table.php
+database/migrations/2026_11_18_163215_create_flights_table.php
+database/migrations/2026_11_18_163216_create_bookings_table.php
+database/migrations/2026_11_18_163216_create_flight_classes_table.php
+database/migrations/2026_11_18_163216_create_seats_table.php
+database/migrations/2026_11_18_163217_create_booking_flights_table.php
+database/migrations/2026_11_18_163217_create_passengers_table.php
+database/migrations/2026_11_18_163218_create_payments_table.php
+database/migrations/2026_11_18_163218_create_tickets_table.php
+database/migrations/2026_11_18_163219_create_credit_transactions_table.php
+database/migrations/2026_11_18_163219_create_notification_logs_table.php
+database/migrations/2026_11_18_163220_create_ai_conversations_table.php
+database/migrations/2026_11_18_163220_create_recommendations_table.php
+database/migrations/2026_11_18_163221_create_reviews_table.php
+database/migrations/2026_11_18_163223_create_contact_messages_table.php
+database/migrations/2026_11_18_163224_create_sessions_table.php
+database/migrations/2026_11_20_150000_add_operation_identity_to_credit_transactions.php
+database/seeders/BrowserFlowSeeder.php
+database/seeders/CountrySeeder.php
+database/seeders/DatabaseSeeder.php
+database/seeders/DemoSeeder.php
+
+[docs]
+docs/demo-data.md
+docs/DEV3_STATUS.md
+docs/gemini-assistant.md
+docs/RJ_FLOW_COMPARISON_AR.md
+docs/ROUTE_QA_REPORT.md
+docs/TEAM_IMPLEMENTATION_PLAN_AR.md
+
+[output]
+output/chat-live-result.jpg
+output/comparison-live.jpg
+output/conversation-retry.jpg
+output/conversation-test.jpg
+output/date-validation.jpg
+output/gemini-working.jpg
+output/pdf/Yalla-Teer-Team-Implementation-Plan.pdf
+output/pdf/Yalla-Teer-Team-Plan.html
+
+[package-lock.json]
+package-lock.json
+
+[phpunit.xml]
+phpunit.xml
+
+[resources]
+resources/css/app.css
+resources/js/app.js
+resources/js/date-constraints.js
+resources/js/landing.js
+resources/views/airline/flights/create.blade.php
+resources/views/airline/flights/edit.blade.php
+resources/views/airline-admin/login.blade.php
+resources/views/auth/login.blade.php
+resources/views/auth/register.blade.php
+resources/views/booking/passenger-selection.blade.php
+resources/views/components/flight-card.blade.php
+resources/views/components/landing-search.blade.php
+resources/views/components/travel-field.blade.php
+resources/views/customer/account.blade.php
+resources/views/customer/assistant/show.blade.php
+resources/views/flights/compare.blade.php
+resources/views/flights/filters.blade.php
+resources/views/flights/index.blade.php
+resources/views/flights/selection.blade.php
+resources/views/flights/show.blade.php
+resources/views/layouts/app.blade.php
+resources/views/pages/assistant.blade.php
+resources/views/pages/information.blade.php
+resources/views/staff/panel.blade.php
+resources/views/super-admin/countries/create.blade.php
+resources/views/super-admin/countries/edit.blade.php
+resources/views/super-admin/countries/form.blade.php
+resources/views/super-admin/countries/index.blade.php
+resources/views/super-admin/countries/layout.blade.php
+resources/views/super-admin/credits/content.blade.php
+resources/views/super-admin/dashboard/content.blade.php
+
+[routes]
+routes/omar-routes.txt
+routes/web.php
+
+[tests]
+tests/Feature/AllRoutesTest.php
+tests/Feature/DemoSeederTest.php
+tests/Feature/Dev3FlowTest.php
+tests/Feature/ExampleTest.php
+tests/Feature/GeminiAssistantTest.php
+tests/Feature/HostedStripeCheckoutTest.php
+tests/Feature/OmarCountriesTest.php
+tests/Feature/OmarDiscoveryTest.php
+tests/Feature/OmarMergeReviewTest.php
+tests/Feature/StripePaymentFlowTest.php
+tests/Feature/TravelDatesTest.php
+tests/prepare-browser-qa.php
+tests/Support/RouteFixtures.php
+
+=== REMOVED OR RENAMED HISTORICAL PROJECT PATHS ===
+app/Http/Controllers/AiConversationController.php
+app/Http/Controllers/AirlineAdminController.php
+app/Http/Controllers/AirlineController.php
+app/Http/Controllers/AirportController.php
+app/Http/Controllers/BookingController.php
+app/Http/Controllers/BookingFlightController.php
+app/Http/Controllers/CityController.php
+app/Http/Controllers/ContactMessageController.php
+app/Http/Controllers/CountryController.php
+app/Http/Controllers/CreditTransactionController.php
+app/Http/Controllers/CustomerController.php
+app/Http/Controllers/FlightClassController.php
+app/Http/Controllers/FlightController.php
+app/Http/Controllers/NotificationLogController.php
+app/Http/Controllers/PassengerController.php
+app/Http/Controllers/PaymentController.php
+app/Http/Controllers/RecommendationController.php
+app/Http/Controllers/ReviewController.php
+app/Http/Controllers/SeatController.php
+app/Http/Controllers/SuperAdminController.php
+app/Http/Controllers/TicketController.php
+app/Services/OMAR_BOOKING_HANDOFF.md
+app/Services/OMAR_MERGE_REVIEW.md
+database/migrations/2026_11_18_163212_create_airports_table.php
+database/migrations/2026_11_18_163215_create_flight_classes_table.php
+resources/views/omar/admin/credits.blade.php
+resources/views/omar/admin/credits-blocked.blade.php
+resources/views/omar/admin/dashboard.blade.php
+resources/views/omar/assistant/index.blade.php
+resources/views/omar/assistant/show.blade.php
+resources/views/omar/flights/compare.blade.php
+resources/views/omar/flights/filters.blade.php
+resources/views/omar/flights/index.blade.php
+resources/views/omar/flights/selection.blade.php
+resources/views/omar/flights/show.blade.php
+resources/views/omar/information/faq.blade.php
+resources/views/omar/information/terms.blade.php
+resources/views/omar/layout.blade.php
+resources/views/omar/reviews/create.blade.php
+
+=== DEPENDENCY PATHS (VENDOR / NODE_MODULES) ===
+
+=== SOURCE COMMITS ===
+ac5a88c | 2026-11-21 | adding AI
+876ea9a | 2026-11-20 | seeders
+3652eef | 2026-11-20 | editting omar views
+b86c8d9 | 2026-11-20 | remove
+8555b98 | 2026-11-20 | deleteing unneseccery files
+d0b7103 | 2026-11-20 | passengers
+58226e2 | 2026-11-20 | editting vendor for stripe and routing for the right redirect
+0a0647e | 2026-11-20 | adding flight controller
+1b96472 | 2026-11-20 | adding omar work
+19b2b5e | 2026-11-19 | plan
+2d7616a | 2026-11-19 | package editting
+c9dce2e | 2026-11-18 | adding session
+f636f80 | 2026-11-18 | testing branches
+185450d | 2026-11-18 | editting order
+e87b900 | 2026-11-18 | migrations and models completed

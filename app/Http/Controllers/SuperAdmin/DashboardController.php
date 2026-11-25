@@ -23,8 +23,10 @@ class DashboardController
             'Payments' => Payment::query(),
             'Successful payments' => Payment::where('status', 'succeeded'),
         ];
-        $recentBookings = Booking::with('customer.user')->latest('id')->limit(10)->get();
-        $recentPayments = Payment::with('booking')->latest('id')->limit(10)->get();
+        $recentBookings = Booking::with('customer.user')->latest('id')
+            ->paginate(5, ['*'], 'bookings_page')->fragment('recent-bookings');
+        $recentPayments = Payment::with('booking')->latest('id')
+            ->paginate(5, ['*'], 'payments_page')->fragment('recent-payments');
 
         $statistics = array_map(fn ($query) => $query->count(), $queries);
 

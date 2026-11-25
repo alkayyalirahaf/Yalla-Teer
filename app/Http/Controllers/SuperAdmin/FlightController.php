@@ -25,11 +25,11 @@ class FlightController
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['airline_id'] ?? null, fn ($query, $airlineId) => $query->where('airline_id', $airlineId))
             ->latest('departure_at')
-            ->paginate(15)
+            ->paginate(5)
             ->withQueryString();
 
         $airlines = Airline::query()->orderBy('name')->get(['id', 'name', 'code']);
 
-        return view('super-admin.flights.index', compact('flights', 'airlines'));
+        return view('super-admin.flights.index', compact('flights', 'airlines', 'filters'));
     }
 }

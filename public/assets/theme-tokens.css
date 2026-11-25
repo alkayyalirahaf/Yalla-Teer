@@ -1,0 +1,36 @@
+:root {
+    --ui-brand: #bf6240;
+    --ui-action: #a34d30;
+    --ui-hover: #873d25;
+    --ui-link: #984428;
+    --ui-on-action: white;
+    --ui-tint: #f5e5dd;
+    --ui-secondary: #24343d;
+    --ui-bg: #f8f6f3;
+    --ui-surface: #ffffff;
+    --ui-raised: #f1eeea;
+    --ui-text: #20252b;
+    --ui-muted: #606970;
+    --ui-border: #d5cec7;
+    --ui-control-border: #85807b;
+    --ui-warning: #79500b;
+    --ui-danger: #a23138;
+    --ui-success: #246647;
+}
+:root[data-theme="dark"] {
+    --ui-action: #de9478;
+    --ui-hover: #eaa78f;
+    --ui-link: #de9478;
+    --ui-on-action: #201711;
+    --ui-tint: #382923;
+    --ui-bg: #101418;
+    --ui-surface: #191f25;
+    --ui-raised: #222a31;
+    --ui-text: #f5f5f5;
+    --ui-muted: #adb5bd;
+    --ui-border: #424c55;
+    --ui-control-border: #76818c;
+    --ui-warning: #edc57e;
+    --ui-danger: #ffabb0;
+    --ui-success: #8ed7ac;
+}
