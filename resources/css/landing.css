@@ -31,7 +31,7 @@
 .landing h1,.landing h2 {font:400 clamp(2.55rem,6.1vw,6rem)/.99 var(--site-font);letter-spacing:-.056em;text-wrap:balance}
 .landing h1 {max-inline-size:13ch}
 .landing h2 {font-size:clamp(2.35rem,5.1vw,4.7rem)}
-.landing :is(h1, h2):lang(en) {font-family:"Cormorant",Georgia,serif;font-weight:600;letter-spacing:-.035em}
+.landing :is(h1, h2):lang(en) {font-family:var(--site-font);font-weight:700;letter-spacing:-.035em}
 .landing :is(h1, h2):lang(en) em {font-weight:600}
 .landing .site-footer .landing-footer-links h2:lang(en) {font-family:var(--site-font);font-weight:700;letter-spacing:normal}
 .landing h1 em,.landing h2 em {color:var(--highlight);font-weight:400}

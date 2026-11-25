@@ -3,7 +3,6 @@
 @section('title', __('Find your next flight'))
 @section('body-class', 'landing')
 @section('display-font')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500..700;1,500..700&amp;display=swap">
 @endsection
 
 @section('navigation')
