@@ -1065,3 +1065,53 @@ select option { color: var(--ui-text); background: var(--ui-surface); }
 .message-dialog-content > header { display:flex; align-items:center; justify-content:space-between; gap:1rem; border:0; border-bottom:1px solid var(--ui-border); padding:0 0 .75rem; background:transparent; color:var(--ui-text); }
 .message-dialog-content h2 { margin:0; color:var(--ui-text); font-size:1.2rem; }
 .message-dialog-content p { margin:1rem 0 0; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.65; color:var(--ui-text); }
+
+/* Star rating input */
+.star-rating-field { border: 0; padding: 0; margin: 0; min-width: 0; }
+.star-rating-field legend { font-weight: 600; margin-bottom: .35rem; padding: 0; }
+.star-rating { display: inline-flex; flex-direction: row-reverse; gap: .15rem; align-items: center; }
+.star-rating input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.star-rating label { cursor: pointer; font-size: 2rem; line-height: 1; color: #cbd5e1; transition: color .15s ease, transform .15s ease; padding: .1rem; }
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label,
+.star-rating input:focus-visible + label { color: #f59e0b; }
+.star-rating label:hover { transform: scale(1.08); }
+.star-rating input:focus-visible + label { outline: 2px solid var(--primary, #0f766e); outline-offset: 2px; border-radius: .25rem; }
+
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Airlines directory */
+.airlines-page-head { margin-bottom: 1.5rem; }
+.airlines-page-lead { max-width: 42rem; font-size: clamp(1rem, 1.2vw + .85rem, 1.15rem); }
+.airlines-grid { gap: 1.25rem; }
+.airline-card { overflow: hidden; }
+.airline-card-header { display: flex; gap: 1.25rem; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+.airline-brand { display: flex; gap: 1rem; align-items: center; min-width: 0; flex: 1 1 18rem; }
+.airline-logo { width: clamp(72px, 10vw, 112px); height: clamp(72px, 10vw, 112px); object-fit: contain; border-radius: 1rem; background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb); padding: .5rem; flex-shrink: 0; }
+.airline-logo-fallback { display: grid; place-items: center; font-weight: 700; font-size: clamp(1.25rem, 2vw, 1.75rem); color: var(--primary, #0f766e); background: var(--ui-raised, #f3f4f6); }
+.airline-brand-copy { min-width: 0; }
+.airline-name { margin: .15rem 0 .25rem; font-size: clamp(1.35rem, 2.2vw + .8rem, 2rem); line-height: 1.2; overflow-wrap: anywhere; }
+.airline-meta { margin: 0; display: flex; flex-wrap: wrap; gap: .35rem; font-size: clamp(.95rem, .6vw + .85rem, 1rem); }
+.airline-rating-summary { text-align: right; flex: 0 0 auto; margin-left: auto; }
+.airline-rating-value { margin: .3rem 0 0; font-size: clamp(1rem, .8vw + .85rem, 1.15rem); }
+.airline-rating-count { margin: .1rem 0 0; font-size: .95rem; }
+.star-display { font-size: clamp(1.2rem, 1.5vw + .8rem, 1.6rem); line-height: 1; letter-spacing: .05em; }
+.star-display-sm { font-size: 1rem; }
+.star-filled { color: #f59e0b; }
+.star-empty { color: #cbd5e1; }
+.airline-comments { margin-top: 1.25rem; }
+.airline-comments-head { display: flex; justify-content: space-between; gap: .75rem; align-items: baseline; flex-wrap: wrap; margin-bottom: .25rem; }
+.airline-comments-head h3 { margin: 0; font-size: clamp(1.05rem, 1vw + .85rem, 1.25rem); }
+.airline-comment { margin-top: .75rem; }
+.airline-comment-head { display: flex; justify-content: space-between; gap: .75rem; align-items: flex-start; flex-wrap: wrap; }
+.airline-comment-author { font-size: 1rem; overflow-wrap: anywhere; }
+.airline-comment-flight { margin: .15rem 0 0; font-size: .9rem; }
+.airline-comment-meta { display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; font-size: .9rem; }
+.airline-comment-text { margin: .65rem 0 0; font-size: clamp(.95rem, .4vw + .88rem, 1rem); line-height: 1.6; overflow-wrap: anywhere; white-space: pre-line; }
+@media (max-width: 720px) {
+  .airline-card-header { flex-direction: column; align-items: stretch; }
+  .airline-rating-summary { text-align: left; margin-left: 0; }
+  .airline-comment-meta { align-items: flex-start; }
+  .airline-brand { flex-basis: auto; }
+}

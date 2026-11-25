@@ -20,6 +20,7 @@ use App\Http\Controllers\Customer\SeatSelectionController;
 use App\Http\Controllers\Customer\TicketController;
 use App\Http\Controllers\Customer\TravelerProfileController;
 use App\Http\Controllers\PublicFlightController;
+use App\Http\Controllers\PublicSite\AirlineController as PublicAirlineController;
 use App\Http\Controllers\PublicSite\CompareController;
 use App\Http\Controllers\PublicSite\ContactMessageController;
 use App\Http\Controllers\PublicSite\DestinationController;
@@ -48,6 +49,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(SetLandingLocale::class)->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
+    Route::get('/airlines', [PublicAirlineController::class, 'index'])->name('airlines.index');
 });
 
 Route::post('/language/{locale}', function (Request $request, string $locale) {
@@ -295,3 +297,5 @@ use App\Http\Controllers\Customer\PassportScanController;
 Route::post('/book/passport-scan', PassportScanController::class)
     ->middleware('throttle:10,1')
     ->name('book.passport-scan');
+
+Route::get('/airlines', [PublicAirlineController::class, 'index'])->name('airlines.index');

@@ -37,7 +37,16 @@
             @csrf
             <h2>{{ $segment->flight->airline->name }} · {{ $segment->flight->flight_number }}</h2>
             <p>{{ __('Booking') }} {{ $segment->booking->code }}</p>
-            <x-travel-field name="rating" label="Rating" :options="[5 => '5 stars', 4 => '4 stars', 3 => '3 stars', 2 => '2 stars', 1 => '1 star']" required />
+            <fieldset class="field star-rating-field">
+                <legend>{{ __('Rating') }}</legend>
+                <div class="star-rating" aria-label="{{ __('Rating out of 5 stars') }}">
+                    @for($star = 5; $star >= 1; $star--)
+                        <input type="radio" id="rating-{{ $star }}" name="rating" value="{{ $star }}" @checked((string) old('rating') === (string) $star) @required($star === 5)>
+                        <label for="rating-{{ $star }}" title="{{ $star }} {{ $star === 1 ? __('star') : __('stars') }}"><span aria-hidden="true">&#9733;</span><span class="sr-only">{{ $star }} {{ $star === 1 ? __('star') : __('stars') }}</span></label>
+                    @endfor
+                </div>
+                @error('rating')<small class="error">{{ $message }}</small>@enderror
+            </fieldset>
             <x-travel-field name="comment" label="Comment" type="textarea" maxlength="5000" required />
             <p>{{ __('Submitted reviews are hidden until moderation.') }}</p>
             <button class="button" type="submit">{{ __('Submit review') }}</button>

@@ -10,6 +10,7 @@
     <div class="landing-nav-links">
         <a href="#flight-search">{{ __('Flights') }}</a>
         <a href="#destinations">{{ __('Destinations') }}</a>
+        <a href="{{ route('airlines.index') }}">{{ __('Airlines') }}</a>
         <a href="#ai-copilot">{{ __('AI Assistant') }}</a>
         <a href="#how-it-works">{{ __('How It Works') }}</a>
     </div>
@@ -154,6 +155,7 @@
             <ul>
                 <li><a href="#flight-search">{{ __('Flights') }}</a></li>
                 <li><a href="{{ route('destinations') }}">{{ __('Destinations') }}</a></li>
+                <li><a href="{{ route('airlines.index') }}">{{ __('Airlines') }}</a></li>
                 <li><a href="{{ route('assistant') }}">{{ __('AI Assistant') }}</a></li>
             </ul>
         </section>

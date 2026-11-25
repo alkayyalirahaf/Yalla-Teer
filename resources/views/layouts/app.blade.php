@@ -30,6 +30,9 @@
                 @section('navigation')
                 <a href="{{ route('flights.search') }}">{{ __('Flights') }}</a>
                 <a href="{{ route('destinations') }}">{{ __('Destinations') }}</a>
+                @if(Route::has('airlines.index'))
+                    <a href="{{ route('airlines.index') }}">{{ __('Airlines') }}</a>
+                @endif
                 <a href="{{ route('booking.lookup') }}">{{ __('Booking lookup') }}</a>
                 @guest
                     <a href="{{ route('my.bookings') }}">{{ __('My bookings') }}</a>
@@ -69,7 +72,7 @@
             <a class="brand" href="{{ route('home') }}"><img src="{{ asset('assets/yallateer-wordmark.png') }}" width="174" height="59" alt="{{ __('YallaTeer home') }}"></a>
             @section('footer-links')
             <nav aria-label="{{ __('Footer') }}">
-                @foreach(['about' => 'About', 'faq' => 'FAQ', 'terms' => 'Terms', 'privacy' => 'Privacy', 'contact' => 'Contact', 'assistant' => 'AI assistant'] as $name => $label)
+                @foreach(['airlines.index' => 'Airlines', 'about' => 'About', 'faq' => 'FAQ', 'terms' => 'Terms', 'privacy' => 'Privacy', 'contact' => 'Contact', 'assistant' => 'AI assistant'] as $name => $label)
                     <a href="{{ route($name) }}">{{ __($label) }}</a>
                 @endforeach
             </nav>
