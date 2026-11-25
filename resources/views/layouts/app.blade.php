@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Travel') | Yalla Teer</title>
     <link rel="icon" href="{{ asset('assets/yallateer-wordmark.png') }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,400..800;1,400..800&amp;family=Tajawal:wght@400;500;700;800&amp;display=swap">
     @section('display-font')@show
     <link rel="stylesheet" href="{{ asset('assets/theme-tokens.css') }}">
     @stack('framework-styles')
