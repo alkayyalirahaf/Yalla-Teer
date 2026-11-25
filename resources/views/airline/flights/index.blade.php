@@ -36,6 +36,7 @@
         <thead>
             <tr>
                 <th scope="col">{{ __('Flight') }}</th>
+                <th scope="col">{{ __('Type') }}</th>
                 <th scope="col">{{ __('Route') }}</th>
                 <th scope="col">{{ __('Departure') }}</th>
                 <th scope="col">{{ __('Arrival') }}</th>
@@ -48,8 +49,7 @@
         <tbody>
             @forelse($flights as $flight)
                 <tr>
-                    <th scope="row">{{ $flight->flight_number }}</th>
-                    <td>{{ $flight->originAirport->code }} → {{ $flight->destinationAirport->code }}</td>
+                    <th scope="row">                         {{ $flight->flight_number }}                         @if($flight->trip_type === 'round_trip' && $flight->returnFlight)                             <div class="muted">{{ __('Return') }}: {{ $flight->returnFlight->flight_number }}</div>                         @endif                     </th>                     <td>{{ $flight->trip_type === 'round_trip' ? __('Round trip') : __('One way') }}</td>                                         <td>{{ $flight->originAirport->code }} → {{ $flight->destinationAirport->code }}</td>
                     <td>{{ $flight->departure_at->format('Y-m-d H:i') }}</td>
                     <td>{{ $flight->arrival_at->format('Y-m-d H:i') }}</td>
                     <td>{{ $flight->stops }}</td>

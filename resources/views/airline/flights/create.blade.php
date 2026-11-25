@@ -62,6 +62,14 @@
                 <small class="muted">Locked to your airline. Manage origin country and logo in <a href="{{ route('airline.settings') }}">Airline settings</a>.</small>
             </div>
             <label class="field">
+                <span>Trip type</span>
+                <select name="trip_type" required data-trip-type>
+                    <option value="one_way" @selected(old('trip_type', 'one_way') === 'one_way')>One way</option>
+                    <option value="round_trip" @selected(old('trip_type') === 'round_trip')>Round trip</option>
+                </select>
+                @error('trip_type')<small class="error">{{ $message }}</small>@enderror
+            </label>
+            <label class="field">
                 <span>Flight number</span>
                 <input type="text" name="flight_number" value="{{ old('flight_number') }}" maxlength="10" required>
                 @error('flight_number')<small class="error">{{ $message }}</small>@enderror
@@ -119,6 +127,35 @@
                     @endforeach
                 </select>
                 @error('status')<small class="error">{{ $message }}</small>@enderror
+            </label>
+        </div>
+    </section>
+
+    <section class="panel stack" data-return-section {{ old('trip_type') === 'round_trip' ? '' : 'hidden' }}>
+        <div>
+            <h2>Return schedule</h2>
+            <p class="subtle">For round-trip flights, customers book this outbound and return flight together. The return leg uses the same cabin classes, prices, seat layout, and baggage as the outbound flight.</p>
+        </div>
+        <div class="form-grid">
+            <label class="field">
+                <span>Return flight number</span>
+                <input type="text" name="return_flight_number" value="{{ old('return_flight_number') }}" maxlength="10" data-return-required>
+                @error('return_flight_number')<small class="error">{{ $message }}</small>@enderror
+            </label>
+            <label class="field">
+                <span>Return departure</span>
+                <input type="datetime-local" name="return_departure_at" min="{{ now()->format('Y-m-d\TH:i') }}" value="{{ old('return_departure_at') }}" data-return-required>
+                @error('return_departure_at')<small class="error">{{ $message }}</small>@enderror
+            </label>
+            <label class="field">
+                <span>Return arrival</span>
+                <input type="datetime-local" name="return_arrival_at" min="{{ now()->format('Y-m-d\TH:i') }}" value="{{ old('return_arrival_at') }}" data-return-required>
+                @error('return_arrival_at')<small class="error">{{ $message }}</small>@enderror
+            </label>
+            <label class="field">
+                <span>Return stops</span>
+                <input type="number" name="return_stops" value="{{ old('return_stops', 0) }}" min="0" max="10" data-return-required>
+                @error('return_stops')<small class="error">{{ $message }}</small>@enderror
             </label>
         </div>
     </section>
@@ -250,6 +287,23 @@
 </form>
 
 <script>
+(() => {
+    const tripType = document.querySelector('[data-trip-type]');
+    const returnSection = document.querySelector('[data-return-section]');
+    const returnFields = document.querySelectorAll('[data-return-required]');
+    const syncTripType = () => {
+        const isRoundTrip = tripType?.value === 'round_trip';
+        if (returnSection) returnSection.hidden = !isRoundTrip;
+        returnFields.forEach((field) => {
+            field.required = isRoundTrip;
+            field.disabled = !isRoundTrip;
+            if (!isRoundTrip && field.type !== 'number') field.value = field.value;
+        });
+    };
+    tripType?.addEventListener('change', syncTripType);
+    syncTripType();
+})();
+
 (() => {
     const root = document.querySelector('[data-cabins]');
     if (!root) return;

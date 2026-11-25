@@ -37,7 +37,7 @@ class FlightSearchService
             }
         }
 
-        $trip = $input['trip'] ?? (!empty($input['return']) ? 'round_trip' : 'one_way');
+        $trip = $input['trip'] ?? (! empty($input['return']) ? 'round_trip' : 'one_way');
         $input['trip'] = match ($trip) {
             'one-way' => 'one_way',
             'round-trip' => 'round_trip',
@@ -89,13 +89,11 @@ class FlightSearchService
             'budget' => ['nullable', 'numeric', 'min:0', 'max:99999999.99', 'gte:min_price'],
             'sort' => ['required', Rule::in(['price_asc', 'price_desc', 'departure_asc', 'departure_desc'])],
             'passengers' => ['required', 'integer', 'min:1', 'max:9'],
-            'leg' => ['required', Rule::in(['outbound', 'return'])],
-            'outbound_class_id' => ['nullable', 'required_if:leg,return', 'integer', 'exists:flight_classes,id'],
+            'leg' => ['nullable', Rule::in(['outbound', 'return'])],
+            'outbound_class_id' => ['nullable', 'integer', 'exists:flight_classes,id'],
         ])->validate();
 
-        if ($filters['leg'] === 'return' && $filters['trip'] !== 'round_trip') {
-            throw ValidationException::withMessages(['leg' => 'A return leg requires a round-trip search.']);
-        }
+        $filters['leg'] = 'outbound';
 
         return array_merge($filters, $travelers);
     }
@@ -128,6 +126,7 @@ class FlightSearchService
     {
         return Flight::whereIn('status', ['scheduled', 'delayed'])
             ->where('departure_at', '>', now())
+            ->where('is_return_leg', false)
             ->whereHas('airline', fn ($query) => $query->where('status', 'active'));
     }
 
@@ -137,7 +136,7 @@ class FlightSearchService
             $query->where('price', '>=', $filters['min_price'] ?? 0)
                 ->whereHas('seats', fn ($seats) => $seats->availableForBooking(), '>=', (int) ($filters['passengers'] ?? 1));
 
-            if (!empty($filters['cabin'])) {
+            if (! empty($filters['cabin'])) {
                 $query->where('class', $filters['cabin']);
             }
             if (isset($filters['budget'])) {
@@ -149,15 +148,15 @@ class FlightSearchService
     // Call with validated filters. Shared by search and selection revalidation.
     public function query(array $filters): Builder
     {
-        $returnLeg = $filters['leg'] === 'return';
-        $originCode = $filters[$returnLeg ? 'to' : 'from'] ?? null;
-        $destinationCode = $filters[$returnLeg ? 'from' : 'to'] ?? null;
-        $originCity = $filters[$returnLeg ? 'destination_city_id' : 'origin_city_id'] ?? null;
-        $destinationCity = $filters[$returnLeg ? 'origin_city_id' : 'destination_city_id'] ?? null;
+        $trip = $filters['trip'] ?? 'one_way';
+        $originCode = $filters['from'] ?? null;
+        $destinationCode = $filters['to'] ?? null;
+        $originCity = $filters['origin_city_id'] ?? null;
+        $destinationCity = $filters['destination_city_id'] ?? null;
         $classes = $this->classFilter($filters);
 
         $query = $this->availableFlights()
-            ->whereDate('departure_at', $filters[$returnLeg ? 'return' : 'depart'])
+            ->whereDate('departure_at', $filters['depart'])
             ->whereHas('originAirport', function ($airport) use ($originCode, $originCity) {
                 $originCode ? $airport->where('code', $originCode) : $airport->where('city_id', $originCity);
             })
@@ -172,18 +171,23 @@ class FlightSearchService
                 }])
             ->withMin(['flightClasses as minimum_price' => $classes], 'price');
 
-        if ($returnLeg) {
-            $outboundFilters = array_merge($filters, ['leg' => 'outbound']);
-            $outbound = $this->query($outboundFilters)
-                ->whereHas('flightClasses', function ($query) use ($filters, $classes) {
-                    $query->whereKey($filters['outbound_class_id']);
-                    $classes($query);
-                })->first();
-
-            if (!$outbound) {
-                throw ValidationException::withMessages(['outbound_class_id' => 'Select an available outbound cabin matching your search.']);
-            }
-            $query->where('departure_at', '>', $outbound->arrival_at);
+        if ($trip === 'round_trip') {
+            $query->where('trip_type', 'round_trip')
+                ->whereNotNull('return_flight_id')
+                ->whereHas('returnFlight', function ($returnFlight) use ($filters, $classes) {
+                    $returnFlight->whereIn('status', ['scheduled', 'delayed'])
+                        ->whereDate('departure_at', $filters['return'])
+                        ->whereColumn('departure_at', '>', 'flights.arrival_at')
+                        ->whereHas('airline', fn ($query) => $query->where('status', 'active'))
+                        ->whereHas('flightClasses', $classes);
+                })
+                ->with(['returnFlight.airline', 'returnFlight.originAirport.city', 'returnFlight.destinationAirport.city',
+                    'returnFlight.flightClasses' => function ($query) use ($classes) {
+                        $classes($query);
+                        $query->withCount(['seats as available_seats_count' => fn ($seats) => $seats->availableForBooking()]);
+                    }]);
+        } else {
+            $query->where('trip_type', 'one_way');
         }
 
         return $query;

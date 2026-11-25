@@ -116,29 +116,39 @@ class DemoSeeder extends Seeder
     {
         $flights = [];
         $inventory = app(FlightInventoryService::class);
-        // Three carriers on the same route/date enable comparison; reverse legs enable round trips.
+        // Three carriers on the same route/date enable comparison; round-trip products pair outbound and return legs.
         foreach ([1, 3, 7, 14, 21, 30, -7] as $day) {
             foreach (['DXB', 'CAI', 'IST', 'RUH', 'DOH', 'LHR', 'CDG', 'FCO', 'BKK', 'HND', 'JFK'] as $route => $destination) {
                 foreach (['RJ', 'EK', 'TK'] as $carrier => $code) {
-                    foreach ([false, true] as $return) {
-                        $number = $code.'D'.sprintf('%02d', $route).$carrier.($return ? 'R' : 'O');
-                        $departure = today()->addDays($day + ($return ? 4 : 0))->setTime(8 + $carrier * 3, 0);
-                        $flight = Flight::where('flight_number', $number)->where('departure_at', $departure)->first();
-                        if (! $flight) {
-                            $base = 90 + $route * 45 + $carrier * 25;
-                            $flight = $inventory->createFlight($airlines[$code]->id, [
-                                'flight_number' => $number, 'origin_airport_id' => $airports[$return ? $destination : 'AMM']->id,
-                                'destination_airport_id' => $airports[$return ? 'AMM' : $destination]->id,
-                                'departure_at' => $departure->toDateTimeString(), 'arrival_at' => $departure->copy()->addHours(2 + $route)->toDateTimeString(),
-                                'stops' => $route > 7 ? 1 : 0, 'status' => $day < 0 ? 'completed' : ($day === 21 && $carrier === 2 ? 'cancelled' : ($day === 14 && $carrier === 1 ? 'delayed' : 'scheduled')),
-                            ], [
-                                ['class' => 'economy', 'price' => $base, 'seat_rows' => 10, 'seats_per_row' => 6, 'cabin_baggage_kg' => 7, 'checked_baggage_kg' => 23],
-                                ['class' => 'business', 'price' => $base * 2.5, 'seat_rows' => 3, 'seats_per_row' => 4, 'cabin_baggage_kg' => 10, 'checked_baggage_kg' => 32],
-                                ['class' => 'first', 'price' => $base * 4, 'seat_rows' => 2, 'seats_per_row' => 2, 'cabin_baggage_kg' => 14, 'checked_baggage_kg' => 40],
-                            ]);
-                        }
-                        $flights[$day][$route][$carrier][$return ? 'return' : 'outbound'] = $flight;
+                    $number = $code.'D'.sprintf('%02d', $route).$carrier.'O';
+                    $departure = today()->addDays($day)->setTime(8 + $carrier * 3, 0);
+                    $flight = Flight::where('flight_number', $number)->where('departure_at', $departure)->first();
+                    if (! $flight) {
+                        $base = 90 + $route * 45 + $carrier * 25;
+                        $returnDeparture = today()->addDays($day + 4)->setTime(8 + $carrier * 3, 0);
+                        $status = $day < 0 ? 'completed' : ($day === 21 && $carrier === 2 ? 'cancelled' : ($day === 14 && $carrier === 1 ? 'delayed' : 'scheduled'));
+                        $flight = $inventory->createFlight($airlines[$code]->id, [
+                            'trip_type' => 'round_trip',
+                            'flight_number' => $number,
+                            'origin_airport_id' => $airports['AMM']->id,
+                            'destination_airport_id' => $airports[$destination]->id,
+                            'departure_at' => $departure->toDateTimeString(),
+                            'arrival_at' => $departure->copy()->addHours(2 + $route)->toDateTimeString(),
+                            'stops' => $route > 7 ? 1 : 0,
+                            'status' => $status,
+                            'return_flight_number' => $code.'D'.sprintf('%02d', $route).$carrier.'R',
+                            'return_departure_at' => $returnDeparture->toDateTimeString(),
+                            'return_arrival_at' => $returnDeparture->copy()->addHours(2 + $route)->toDateTimeString(),
+                            'return_stops' => $route > 7 ? 1 : 0,
+                        ], [
+                            ['class' => 'economy', 'price' => $base, 'seat_rows' => 10, 'seats_per_row' => 6, 'cabin_baggage_kg' => 7, 'checked_baggage_kg' => 23],
+                            ['class' => 'business', 'price' => $base * 2.5, 'seat_rows' => 3, 'seats_per_row' => 4, 'cabin_baggage_kg' => 10, 'checked_baggage_kg' => 32],
+                            ['class' => 'first', 'price' => $base * 4, 'seat_rows' => 2, 'seats_per_row' => 2, 'cabin_baggage_kg' => 14, 'checked_baggage_kg' => 40],
+                        ]);
                     }
+                    $flight->loadMissing('returnFlight');
+                    $flights[$day][$route][$carrier]['outbound'] = $flight;
+                    $flights[$day][$route][$carrier]['return'] = $flight->returnFlight;
                 }
             }
         }

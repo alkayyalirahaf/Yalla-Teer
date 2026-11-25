@@ -27,37 +27,35 @@
     </div>
     @if($flights !== null)
         <header class="flight-results-heading">
-            <h2>{{ __($filters['leg'] === 'return' ? 'Return flights' : 'Outbound flights') }}</h2>
+            <h2>{{ __($filters['trip'] === 'round_trip' ? 'Round-trip flights' : 'Outbound flights') }}</h2>
             <span>{{ trans_choice(':count flight|:count flights', $flights->total()) }}</span>
         </header>
         @if(!isset($filters['adults']))
             <p class="notice">{{ __('Choose the adult, youth and child counts in the search form and search again before selecting flights.') }}</p>
         @endif
-        @if($filters['leg'] === 'return')
-            <a class="button secondary flight-change-outbound" href="{{ route('flights.search', array_diff_key(array_merge($filters, ['leg' => 'outbound']), ['outbound_class_id' => true])) }}">{{ __('← Change outbound selection') }}</a>
-        @endif
         <div class="stack section">
         @forelse($flights as $flight)
             <article class="panel flight-result">
                 <x-flight-card :flight="$flight" :preferred-cabin="$filters['cabin'] ?? null" :show-fare="false" />
+                @if($filters['trip'] === 'round_trip' && $flight->returnFlight)
+                    <div class="flight-result__return panel subtle-panel stack" aria-label="{{ __('Return flight included') }}">
+                        <p><strong>{{ __('Round-trip flight') }}</strong> <span class="muted">{{ __('Outbound and return booked together') }}</span></p>
+                        <p>{{ __('Return') }}: {{ $flight->returnFlight->flight_number }} · {{ $flight->returnFlight->originAirport?->city?->name ?? $flight->returnFlight->originAirport?->code }} → {{ $flight->returnFlight->destinationAirport?->city?->name ?? $flight->returnFlight->destinationAirport?->code }} · {{ $flight->returnFlight->departure_at?->format('M j, Y H:i') }}</p>
+                    </div>
+                @endif
                 @foreach($flight->flightClasses as $class)
                     <div class="flight-result__fare">
                         <p class="flight-fare-cabin"><strong>{{ __(ucfirst($class->class)) }}</strong><span>{{ __(':count seats available', ['count' => $class->available_seats_count]) }}</span></p>
-                        <p class="flight-fare-price"><strong>JOD {{ $class->price }}</strong><span>{{ __('per seat') }}</span></p>
+                        <p class="flight-fare-price"><strong>JOD {{ $class->price }}</strong><span>{{ $filters['trip'] === 'round_trip' ? __('per seat, each leg') : __('per seat') }}</span></p>
                         @if(isset($filters['adults']))
-                        @if($filters['trip'] === 'round_trip' && $filters['leg'] === 'outbound')
-                            <a class="button" href="{{ route('flights.search', array_merge($filters, ['leg' => 'return', 'outbound_class_id' => $class->id])) }}">{{ __('Select outbound and find return') }}</a>
-                        @else
                             <form method="POST" action="{{ route('flights.selection') }}">
                                 @csrf
                                 @foreach($filters as $key => $value)
-                                    @if($value !== null && $key !== 'outbound_class_id')<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endif
+                                    @if($value !== null && ! in_array($key, ['outbound_class_id', 'return_class_id', 'leg'], true))<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endif
                                 @endforeach
-                                <input type="hidden" name="outbound_class_id" value="{{ $filters['leg'] === 'return' ? $filters['outbound_class_id'] : $class->id }}">
-                                @if($filters['leg'] === 'return')<input type="hidden" name="return_class_id" value="{{ $class->id }}">@endif
-                                <button class="button" type="submit">{{ __('Confirm flight selection') }}</button>
+                                <input type="hidden" name="outbound_class_id" value="{{ $class->id }}">
+                                <button class="button" type="submit">{{ $filters['trip'] === 'round_trip' ? __('Select round-trip flight') : __('Confirm flight selection') }}</button>
                             </form>
-                        @endif
                         @endif
                     </div>
                 @endforeach

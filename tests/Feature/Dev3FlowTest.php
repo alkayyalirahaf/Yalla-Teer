@@ -2,7 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Airline, Airport, City, Country, CreditTransaction, Customer, Flight, FlightClass, Seat, User};
+use App\Models\Airline;
+use App\Models\Airport;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\CreditTransaction;
+use App\Models\Flight;
+use App\Models\FlightClass;
+use App\Models\Seat;
+use App\Models\User;
 use App\Services\CreditService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -22,12 +30,15 @@ class Dev3FlowTest extends TestCase
         $to = Airport::create(['city_id' => $other->id, 'code' => 'AQJ', 'name' => 'King Hussein']);
         $airline = Airline::create(['name' => 'Test Air', 'code' => 'TA', 'country' => 'Jordan', 'status' => 'active']);
         $classes = [];
-        foreach ([100, 200, 150] as $index => $price) {
-            $return = $index === 2;
-            $date = now()->addDays($return ? 7 : 5)->startOfDay()->addHours(12 + $index);
-            $flight = Flight::create(['airline_id' => $airline->id, 'flight_number' => 'TA'.($index + 1),
-                'origin_airport_id' => $return ? $to->id : $from->id, 'destination_airport_id' => $return ? $from->id : $to->id,
-                'departure_at' => $date, 'arrival_at' => $date->copy()->addHour(), 'stops' => 0, 'status' => 'scheduled']);
+
+        foreach ([100, 200] as $index => $price) {
+            $date = now()->addDays(5)->startOfDay()->addHours(12 + $index);
+            $flight = Flight::create([
+                'airline_id' => $airline->id, 'flight_number' => 'TA'.($index + 1),
+                'origin_airport_id' => $from->id, 'destination_airport_id' => $to->id,
+                'departure_at' => $date, 'arrival_at' => $date->copy()->addHour(),
+                'stops' => 0, 'status' => 'scheduled', 'trip_type' => 'one_way', 'is_return_leg' => false,
+            ]);
             $class = FlightClass::create(['flight_id' => $flight->id, 'class' => 'economy', 'price' => $price,
                 'seat_rows' => 1, 'seats_per_row' => 3, 'total_seats' => 3, 'cabin_baggage_kg' => 7, 'checked_baggage_kg' => 20]);
             foreach (['1A', '1B', '1C'] as $number) {
@@ -35,6 +46,22 @@ class Dev3FlowTest extends TestCase
             }
             $classes[] = $class;
         }
+
+        $returnDate = now()->addDays(7)->startOfDay()->addHours(14);
+        $returnFlight = Flight::create([
+            'airline_id' => $airline->id, 'flight_number' => 'TA3',
+            'origin_airport_id' => $to->id, 'destination_airport_id' => $from->id,
+            'departure_at' => $returnDate, 'arrival_at' => $returnDate->copy()->addHour(),
+            'stops' => 0, 'status' => 'scheduled', 'trip_type' => 'round_trip', 'is_return_leg' => true,
+        ]);
+        $returnClass = FlightClass::create(['flight_id' => $returnFlight->id, 'class' => 'economy', 'price' => 150,
+            'seat_rows' => 1, 'seats_per_row' => 3, 'total_seats' => 3, 'cabin_baggage_kg' => 7, 'checked_baggage_kg' => 20]);
+        foreach (['1A', '1B', '1C'] as $number) {
+            Seat::create(['flight_class_id' => $returnClass->id, 'seat_number' => $number, 'status' => 'available']);
+        }
+        $classes[0]->flight->update(['trip_type' => 'round_trip', 'return_flight_id' => $returnFlight->id]);
+        $classes[] = $returnClass;
+
         return $classes;
     }
 
@@ -49,14 +76,14 @@ class Dev3FlowTest extends TestCase
         [$first, $second, $return] = $this->inventory();
         $this->get('/')->assertOk()->assertSee('Queen Alia')->assertDontSee('name="trip" value="multi-city"', false);
         $this->get('/flights')->assertOk()->assertViewIs('flights.index')->assertSee('landing-search')->assertDontSee('bootstrap.min.css');
-        $this->get(route('flights.search', $this->filters()))->assertOk()->assertSee('TA1')->assertSee('TA2')->assertDontSee('TA3');
-        $this->get(route('flights.search', $this->filters(['budget' => 150])))->assertOk()->assertSee('TA1')->assertDontSee('TA2');
+        $this->get(route('flights.search', $this->filters()))->assertOk()->assertDontSee('TA1')->assertSee('TA2')->assertDontSee('TA3');
+        $this->get(route('flights.search', $this->filters(['budget' => 150])))->assertOk()->assertDontSee('TA1')->assertDontSee('TA2');
         $this->get(route('flights.show', $first->flight_id))->assertOk()->assertViewIs('flights.show')->assertSee('Queen Alia')->assertSee('100.00');
         $this->get(route('compare', ['flights' => [$first->flight_id, $second->flight_id]]))->assertOk()->assertViewIs('flights.compare')->assertSee('TA1')->assertSee('TA2');
         $round = $this->filters(['trip' => 'round-trip', 'return' => now()->addDays(7)->toDateString()]);
-        $this->get(route('flights.search', array_merge($round, ['leg' => 'return', 'outbound_class_id' => $first->id])))
-            ->assertOk()->assertSee('TA3')->assertDontSee('TA2');
-        $this->post(route('flights.selection'), array_merge($round, ['outbound_class_id' => $first->id, 'return_class_id' => $return->id]))
+        $this->get(route('flights.search', $round))
+            ->assertOk()->assertSee('TA1')->assertSee('TA3')->assertDontSee('TA2');
+        $this->post(route('flights.selection'), array_merge($round, ['outbound_class_id' => $first->id]))
             ->assertOk()->assertViewIs('flights.selection')->assertSessionHas('dev3.search_selection.outbound.flight_class_id', $first->id)
             ->assertSessionHas('dev3.search_selection.return.flight_class_id', $return->id);
         $first->seats()->update(['status' => 'booked']);

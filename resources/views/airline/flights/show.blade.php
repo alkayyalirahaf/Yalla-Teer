@@ -21,6 +21,14 @@
     <div><p>{{ __('Arrival') }}</p><h2>{{ $flight->arrival_at->format('Y-m-d H:i') }}</h2></div>
 </section>
 
+@if($flight->trip_type === 'round_trip' && $flight->returnFlight)
+<section class="panel section stack" aria-label="{{ __('Return flight') }}">
+    <h2>{{ __('Return flight') }}</h2>
+    <p><strong>{{ $flight->returnFlight->flight_number }}</strong> · {{ $flight->returnFlight->originAirport?->code }} → {{ $flight->returnFlight->destinationAirport?->code }}</p>
+    <p>{{ __('Departure') }}: {{ $flight->returnFlight->departure_at?->format('Y-m-d H:i') }} · {{ __('Arrival') }}: {{ $flight->returnFlight->arrival_at?->format('Y-m-d H:i') }} · {{ __('Stops') }}: {{ $flight->returnFlight->stops }}</p>
+</section>
+@endif
+
 <section class="section">
     <h2>{{ __('Cabin seat maps') }}</h2>
     <div class="cards">
