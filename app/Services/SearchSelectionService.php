@@ -10,7 +10,7 @@ class SearchSelectionService
     public function select(array $input, FlightSearchService $search): array
     {
         $filters = $search->validateFilters(array_merge($input, ['leg' => 'outbound']));
-        if (!isset($filters['adults'])) {
+        if (! isset($filters['adults'])) {
             throw ValidationException::withMessages([
                 'adults' => 'Choose the adult, youth and child counts and search again before selecting flights.',
             ]);
@@ -24,15 +24,31 @@ class SearchSelectionService
         ];
         $ids = Validator::make($input, [
             'outbound_class_id' => ['required', 'integer', 'min:1'],
-            'return_class_id' => [$filters['trip'] === 'round_trip' ? 'required' : 'prohibited', 'integer', 'min:1', 'different:outbound_class_id'],
+            'return_class_id' => ['prohibited'],
         ])->validate();
 
-        $outbound = $this->leg($filters, (int) $ids['outbound_class_id'], $search);
+        $outboundFlight = $search->query($filters)->whereHas('flightClasses', function ($query) use ($ids, $search, $filters) {
+            $query->whereKey($ids['outbound_class_id']);
+            ($search->classFilter($filters))($query);
+        })->first();
+
+        if (! $outboundFlight) {
+            throw ValidationException::withMessages(['selection' => 'A selected cabin no longer matches the search or has insufficient available seats. Search again.']);
+        }
+
+        $outboundClass = $outboundFlight->flightClasses->firstWhere('id', (int) $ids['outbound_class_id']);
+        $outbound = ['flight_id' => $outboundFlight->id, 'flight_class_id' => $outboundClass->id, 'price' => $outboundClass->price];
         $return = null;
 
         if ($filters['trip'] === 'round_trip') {
-            $returnFilters = array_merge($filters, ['leg' => 'return', 'outbound_class_id' => $ids['outbound_class_id']]);
-            $return = $this->leg($returnFilters, (int) $ids['return_class_id'], $search);
+            $returnFlight = $outboundFlight->returnFlight;
+            $returnClass = $returnFlight?->flightClasses?->firstWhere('class', $outboundClass->class);
+
+            if (! $returnFlight || ! $returnClass) {
+                throw ValidationException::withMessages(['selection' => 'The selected round-trip flight is no longer available. Search again.']);
+            }
+
+            $return = ['flight_id' => $returnFlight->id, 'flight_class_id' => $returnClass->id, 'price' => $returnClass->price];
         }
 
         return [
@@ -49,7 +65,7 @@ class SearchSelectionService
             ($search->classFilter($filters))($query);
         })->first();
 
-        if (!$flight) {
+        if (! $flight) {
             throw ValidationException::withMessages(['selection' => 'A selected cabin no longer matches the search or has insufficient available seats. Search again.']);
         }
 

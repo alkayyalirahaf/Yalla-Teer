@@ -25,6 +25,15 @@
         <p><strong>Destination currency note:</strong> {{ $destinationCountry->name }} uses {{ $destinationCurrencyLabel }}.</p>
     @endif
 </div>
+@if($flight->trip_type === 'round_trip' && $flight->returnFlight)
+<div class="panel section stack" aria-label="{{ __('Return flight') }}">
+    <span class="badge">{{ __('Round-trip flight') }}</span>
+    <h2>{{ __('Return') }}: {{ $flight->returnFlight->flight_number }}</h2>
+    <p>{{ $flight->returnFlight->originAirport?->name }} ({{ $flight->returnFlight->originAirport?->code }}) → {{ $flight->returnFlight->destinationAirport?->name }} ({{ $flight->returnFlight->destinationAirport?->code }})</p>
+    <p>{{ $flight->returnFlight->departure_at?->format('Y-m-d H:i') }} → {{ $flight->returnFlight->arrival_at?->format('Y-m-d H:i') }}</p>
+    <p class="muted">{{ __('This return flight is booked together with the outbound flight as one round-trip product.') }}</p>
+</div>
+@endif
 @if($fleetPhoto)
     <figure class="flight-fleet-photo" data-airline-photo>
         <img data-airline-image src="{{ $fleetPhoto }}" alt="{{ $flight->airline->name }} aircraft">

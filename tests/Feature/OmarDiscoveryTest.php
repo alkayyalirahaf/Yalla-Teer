@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Customer\AiConversationController;
 use App\Http\Controllers\Customer\ReviewController;
+use App\Http\Controllers\PublicFlightController;
 use App\Http\Controllers\PublicSite\CompareController;
 use App\Http\Controllers\SuperAdmin\CreditController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Models\Booking;
 use App\Models\BookingFlight;
-use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Flight;
 use App\Models\FlightClass;
@@ -20,6 +20,10 @@ use App\Services\FlightSearchService;
 use App\Services\PassportExtraction;
 use App\Services\PrePaymentCheck;
 use App\Services\SearchSelectionService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\PresenceVerifierInterface;
@@ -74,7 +78,6 @@ class OmarDiscoveryTest extends TestCase
             ['depart' => 'not-a-date'],
             ['trip' => 'round_trip'],
             ['trip' => 'round_trip', 'return' => now()->addDay()->toDateString()],
-            ['leg' => 'return'],
             ['passengers' => 0], ['passengers' => 10], ['passengers' => '1 OR 1=1'],
             ['cabin' => 'premium'], ['sort' => 'price; DROP TABLE flights'],
             ['budget' => -1], ['budget' => 5, 'min_price' => 10],
@@ -99,12 +102,14 @@ class OmarDiscoveryTest extends TestCase
         (new FlightSearchService)->validateFilters($this->filters(['from' => 'ZZZ']));
     }
 
-    public function test_round_trip_requires_outbound_selection_for_return_leg(): void
+    public function test_round_trip_search_does_not_require_separate_return_leg_selection(): void
     {
-        $this->expectException(ValidationException::class);
-        (new FlightSearchService)->validateFilters($this->filters([
+        $filters = (new FlightSearchService)->validateFilters($this->filters([
             'trip' => 'round_trip', 'return' => now()->addDays(9)->toDateString(), 'leg' => 'return',
         ]));
+
+        $this->assertSame('round_trip', $filters['trip']);
+        $this->assertSame('outbound', $filters['leg']);
     }
 
     public function test_available_query_applies_airline_status_date_price_cabin_and_seat_gates(): void
@@ -139,21 +144,28 @@ class OmarDiscoveryTest extends TestCase
     public function test_round_trip_selection_returns_database_ids_and_prices_instead_of_submitted_prices(): void
     {
         $search = Mockery::mock(FlightSearchService::class)->makePartial();
-        foreach (['outbound' => [10, 20, '150.25'], 'return' => [11, 21, '180.50']] as $leg => [$flightId, $classId, $price]) {
-            $flight = new Flight;
-            $flight->id = $flightId;
-            $class = new FlightClass(['price' => $price]);
-            $class->id = $classId;
-            $flight->setRelation('flightClasses', collect([$class]));
-            $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
-            $query->shouldReceive('whereHas')->once()->andReturnSelf();
-            $query->shouldReceive('first')->once()->andReturn($flight);
-            $search->shouldReceive('query')->once()->withArgs(fn ($filters) => $filters['leg'] === $leg)->andReturn($query);
-        }
+
+        $outboundFlight = new Flight;
+        $outboundFlight->id = 10;
+        $outboundClass = new FlightClass(['class' => 'economy', 'price' => '150.25']);
+        $outboundClass->id = 20;
+        $outboundFlight->setRelation('flightClasses', collect([$outboundClass]));
+
+        $returnFlight = new Flight;
+        $returnFlight->id = 11;
+        $returnClass = new FlightClass(['class' => 'economy', 'price' => '180.50']);
+        $returnClass->id = 21;
+        $returnFlight->setRelation('flightClasses', collect([$returnClass]));
+        $outboundFlight->setRelation('returnFlight', $returnFlight);
+
+        $query = Mockery::mock(Builder::class);
+        $query->shouldReceive('whereHas')->once()->andReturnSelf();
+        $query->shouldReceive('first')->once()->andReturn($outboundFlight);
+        $search->shouldReceive('query')->once()->andReturn($query);
 
         $selection = (new SearchSelectionService)->select($this->filters([
             'trip' => 'round_trip', 'return' => now()->addDays(9)->toDateString(),
-            'outbound_class_id' => 20, 'return_class_id' => 21, 'price' => '0.01',
+            'outbound_class_id' => 20, 'price' => '0.01',
             'adults' => '1', 'youth' => '1', 'children' => '1', 'infants' => '0',
             'passenger_counts' => ['adults' => 99],
         ]), $search);
@@ -186,7 +198,7 @@ class OmarDiscoveryTest extends TestCase
         $class = new FlightClass(['price' => '150.25']);
         $class->id = 20;
         $flight->setRelation('flightClasses', collect([$class]));
-        $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
+        $query = Mockery::mock(Builder::class);
         $query->shouldReceive('whereHas')->once()->andReturnSelf();
         $query->shouldReceive('first')->once()->andReturn($flight);
         $search->shouldReceive('query')->once()->withArgs(fn ($filters) => $filters['passengers'] === 2)->andReturn($query);
@@ -212,7 +224,7 @@ class OmarDiscoveryTest extends TestCase
         $request = Request::create('/flights/selection', 'POST');
         $request->setLaravelSession(app('session')->driver());
 
-        $view = (new \App\Http\Controllers\PublicFlightController)->select($request, $service, new FlightSearchService);
+        $view = (new PublicFlightController)->select($request, $service, new FlightSearchService);
 
         $this->assertSame($selection, $request->session()->get('dev3.search_selection'));
         $this->assertSame($selection, $view->getData()['selection']);
@@ -306,7 +318,7 @@ class OmarDiscoveryTest extends TestCase
         $segment = Mockery::mock(BookingFlight::class)->makePartial();
         $segment->setRelation('booking', new Booking(['customer_id' => 42, 'status' => 'completed']));
         $segment->setRelation('flight', new Flight(['status' => 'completed', 'arrival_at' => now()->subDay()]));
-        $reviews = Mockery::mock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+        $reviews = Mockery::mock(HasMany::class);
         $reviews->shouldReceive('where')->once()->with('customer_id', 42)->andReturnSelf();
         $reviews->shouldReceive('exists')->once()->andReturn(true);
         $segment->shouldReceive('reviews')->once()->andReturn($reviews);
@@ -319,16 +331,16 @@ class OmarDiscoveryTest extends TestCase
     public function test_conversation_reads_are_scoped_to_the_authenticated_customer(): void
     {
         $customer = Mockery::mock(Customer::class)->makePartial();
-        $conversations = Mockery::mock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+        $conversations = Mockery::mock(HasMany::class);
         $conversations->shouldReceive('findOrFail')->once()->with(99)
-            ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException);
+            ->andThrow(new ModelNotFoundException);
         $customer->shouldReceive('aiConversations')->once()->andReturn($conversations);
         $user = new User;
         $user->setRelation('customer', $customer);
         $request = Request::create('/my/assistant/99');
         $request->setUserResolver(fn () => $user);
 
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
         (new AiConversationController)->show($request, 99);
     }
 
@@ -352,7 +364,7 @@ class OmarDiscoveryTest extends TestCase
         $tips = (new AiService)->reply('compare', 'Compare flights');
         $this->assertSame([AiService::TIPS['check_baggage'], AiService::TIPS['verify_itinerary']], $tips);
         Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Bearer fake-test-key')
-            && $request['mode'] === 'compare' && !isset($request['passport']));
+            && $request['mode'] === 'compare' && ! isset($request['passport']));
     }
 
     public function test_ai_provider_errors_are_reported(): void
@@ -367,7 +379,7 @@ class OmarDiscoveryTest extends TestCase
     public function test_ai_timeout_is_reported(): void
     {
         $this->configureAi();
-        Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('timeout'));
+        Http::fake(fn () => throw new ConnectionException('timeout'));
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('could not be reached');
         (new AiService)->reply('tips', 'Travel tips');

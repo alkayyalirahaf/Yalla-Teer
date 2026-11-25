@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Flight extends Model
 {
@@ -17,6 +18,9 @@ class Flight extends Model
         'arrival_at',
         'stops',
         'status',
+        'trip_type',
+        'return_flight_id',
+        'is_return_leg',
     ];
 
     protected function casts(): array
@@ -25,6 +29,7 @@ class Flight extends Model
             'departure_at' => 'datetime',
             'arrival_at' => 'datetime',
             'stops' => 'integer',
+            'is_return_leg' => 'boolean',
         ];
     }
 
@@ -56,5 +61,15 @@ class Flight extends Model
     public function recommendations(): HasMany
     {
         return $this->hasMany(Recommendation::class, 'flight_id');
+    }
+
+    public function returnFlight(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'return_flight_id');
+    }
+
+    public function outboundFlight(): HasOne
+    {
+        return $this->hasOne(self::class, 'return_flight_id');
     }
 }

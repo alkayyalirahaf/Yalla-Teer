@@ -20,9 +20,13 @@ class FlightController
         $airlineId = auth()->user()->airlineAdmin->airline_id;
 
         $flights = Flight::where('airline_id', $airlineId)
-            ->with(['originAirport', 'destinationAirport', 'flightClasses'])
+            ->where('is_return_leg', false)
+            ->with(['originAirport', 'destinationAirport', 'flightClasses', 'returnFlight.originAirport', 'returnFlight.destinationAirport'])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('flight_number', 'like', '%'.$request->search.'%');
+                $query->where(function ($search) use ($request) {
+                    $search->where('flight_number', 'like', '%'.$request->search.'%')
+                        ->orWhereHas('returnFlight', fn ($q) => $q->where('flight_number', 'like', '%'.$request->search.'%'));
+                });
             })
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
@@ -53,6 +57,7 @@ class FlightController
         $airlineId = auth()->user()->airlineAdmin->airline_id;
 
         $validated = $request->validate([
+            'trip_type' => ['required', Rule::in(['one_way', 'round_trip'])],
             'flight_number' => ['required', 'string', 'max:10'],
             'origin_airport_id' => ['required', 'exists:airports,id'],
             'destination_airport_id' => ['required', 'exists:airports,id', 'different:origin_airport_id'],
@@ -60,6 +65,10 @@ class FlightController
             'arrival_at' => ['required', 'date', 'after:departure_at'],
             'stops' => ['required', 'integer', 'min:0', 'max:10'],
             'status' => ['required', Rule::in(['scheduled', 'delayed', 'cancelled', 'completed'])],
+            'return_flight_number' => ['exclude_unless:trip_type,round_trip', 'required', 'string', 'max:10'],
+            'return_departure_at' => ['exclude_unless:trip_type,round_trip', 'required', 'date', 'after:arrival_at'],
+            'return_arrival_at' => ['exclude_unless:trip_type,round_trip', 'required', 'date', 'after:return_departure_at'],
+            'return_stops' => ['exclude_unless:trip_type,round_trip', 'required', 'integer', 'min:0', 'max:10'],
             'classes' => ['required', 'array', 'min:1'],
             'classes.*.class' => ['required', 'distinct', Rule::in(['economy', 'business', 'first'])],
             'classes.*.price' => ['required', 'numeric', 'min:1'],
@@ -73,20 +82,33 @@ class FlightController
 
         return redirect()
             ->route('airline.flight', $flight)
-            ->with('success', 'Flight and seat inventory created successfully.');
+            ->with('success', $flight->trip_type === 'round_trip'
+                ? 'Round-trip flight and seat inventory created successfully.'
+                : 'Flight and seat inventory created successfully.');
     }
 
     public function show(Flight $flight)
     {
         $this->authorizeAirlineFlight($flight);
 
+        if ($flight->is_return_leg) {
+            $outbound = $flight->outboundFlight;
+            if ($outbound) {
+                return redirect()->route('airline.flight', $outbound);
+            }
+        }
+
         $flight->load([
             'originAirport.city',
             'destinationAirport.city',
+            'returnFlight.originAirport.city',
+            'returnFlight.destinationAirport.city',
+            'returnFlight.flightClasses.seats' => fn ($query) => $query->orderBy('id'),
             'flightClasses.seats' => function ($query) {
                 $query->orderBy('id');
             },
             'bookingFlights.booking.customer.user',
+            'returnFlight.bookingFlights.booking.customer.user',
         ]);
 
         return view('airline.flights.show', compact('flight'));
@@ -96,7 +118,11 @@ class FlightController
     {
         $this->authorizeAirlineFlight($flight);
 
-        $flight->load('flightClasses');
+        if ($flight->is_return_leg && $flight->outboundFlight) {
+            return redirect()->route('airline.flights.edit', $flight->outboundFlight);
+        }
+
+        $flight->load(['flightClasses', 'returnFlight']);
         $airports = Airport::with('city')->orderBy('code')->get();
         $airline = auth()->user()->airlineAdmin->airline;
         $layoutPresets = FlightClass::query()
@@ -114,6 +140,7 @@ class FlightController
         $this->authorizeAirlineFlight($flight);
 
         $validated = $request->validate([
+            'trip_type' => ['required', Rule::in(['one_way', 'round_trip'])],
             'flight_number' => ['required', 'string', 'max:10'],
             'origin_airport_id' => ['required', 'exists:airports,id'],
             'destination_airport_id' => ['required', 'exists:airports,id', 'different:origin_airport_id'],
@@ -121,6 +148,10 @@ class FlightController
             'arrival_at' => ['required', 'date', 'after:departure_at'],
             'stops' => ['required', 'integer', 'min:0', 'max:10'],
             'status' => ['required', Rule::in(['scheduled', 'delayed', 'cancelled', 'completed'])],
+            'return_flight_number' => ['exclude_unless:trip_type,round_trip', 'required', 'string', 'max:10'],
+            'return_departure_at' => ['exclude_unless:trip_type,round_trip', 'required', 'date', 'after:arrival_at'],
+            'return_arrival_at' => ['exclude_unless:trip_type,round_trip', 'required', 'date', 'after:return_departure_at'],
+            'return_stops' => ['exclude_unless:trip_type,round_trip', 'required', 'integer', 'min:0', 'max:10'],
             'classes' => ['required', 'array', 'min:1'],
             'classes.*.id' => ['nullable', 'exists:flight_classes,id'],
             'classes.*.class' => ['required', 'distinct', Rule::in(['economy', 'business', 'first'])],
@@ -142,8 +173,17 @@ class FlightController
     {
         $this->authorizeAirlineFlight($flight);
 
-        if ($flight->bookingFlights()->exists()) {
+        if ($flight->is_return_leg) {
+            return back()->with('error', 'Return legs are managed from their round-trip flight.');
+        }
+
+        $returnFlight = $flight->returnFlight;
+        if ($flight->bookingFlights()->exists() || $returnFlight?->bookingFlights()->exists()) {
             return back()->with('error', 'Cannot delete a flight that already has bookings.');
+        }
+
+        if ($returnFlight) {
+            $returnFlight->delete();
         }
 
         $flight->delete();

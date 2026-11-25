@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Airport;
 use App\Models\City;
 use App\Models\Flight;
 use App\Services\FlightSearchService;
 use App\Services\SearchSelectionService;
+use Illuminate\Http\Request;
 
 class PublicFlightController
 {
@@ -31,6 +31,10 @@ class PublicFlightController
     {
         $flight = $search->availableFlights()->with([
             'airline', 'originAirport.city', 'destinationAirport.city',
+            'returnFlight.airline', 'returnFlight.originAirport.city', 'returnFlight.destinationAirport.city',
+            'returnFlight.flightClasses' => fn ($query) => $query->withCount([
+                'seats as available_seats_count' => fn ($seats) => $seats->availableForBooking(),
+            ])->orderBy('price'),
             'flightClasses' => fn ($query) => $query->withCount([
                 'seats as available_seats_count' => fn ($seats) => $seats->availableForBooking(),
             ])->orderBy('price'),

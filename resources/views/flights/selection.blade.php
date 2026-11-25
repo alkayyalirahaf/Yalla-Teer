@@ -6,10 +6,7 @@
 @php
     $selectedFlights = $loadSelectedFlights();
     $backFilters = $selection['filters'] ?? [];
-    if ($selection['trip'] === 'round_trip' && $backFilters) {
-        $backFilters['leg'] = 'return';
-        $backFilters['outbound_class_id'] = $selection['outbound']['flight_class_id'];
-    }
+    unset($backFilters['leg'], $backFilters['outbound_class_id'], $backFilters['return_class_id']);
 @endphp
 <div class="flight-selection stack">
     <header>
